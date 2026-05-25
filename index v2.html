@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Umbría Studio v2 — Tu historia en portada</title>
+  <meta name="description" content="Bodas, estudio, maquillaje, graduaciones y producción audiovisual con la sensibilidad de quienes tratan a cada cliente como familia. Emmanuel y Rosa — Buin, RM, Chile." />
+
+  <!-- Fonts: Bodoni Moda (Didone), Allura (script), Inter (sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Allura&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Favicon: chevron doble Umbría en SVG inline -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M4 22 L16 10 L28 22' fill='none' stroke='%23C97846' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/><path d='M4 28 L16 16 L28 28' fill='none' stroke='%23C97846' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
+
+  <link rel="stylesheet" href="styles-v2.css" />
+  <link rel="stylesheet" href="magazine-styles.css" />
+
+  <!-- Page loader — inline CSS so it shows BEFORE any other resource loads -->
+  <style>
+    #umbria-loader {
+      position: fixed;
+      inset: 0;
+      background: #0a0a0a;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      transition: opacity 700ms ease, visibility 700ms ease;
+    }
+    #umbria-loader.loader--done {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .loader__logo {
+      width: 120px;
+      height: auto;
+      opacity: 0;
+      animation: loaderLogoIn 700ms ease 100ms forwards;
+    }
+    .loader__chevron {
+      width: 64px;
+      height: 64px;
+    }
+    .loader__chevron path {
+      fill: none;
+      stroke: #C97846;
+      stroke-width: 2.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 60;
+      stroke-dashoffset: 60;
+    }
+    .loader__chevron path:nth-child(1) {
+      animation: drawPath 500ms cubic-bezier(0.4,0,0.2,1) 80ms forwards;
+    }
+    .loader__chevron path:nth-child(2) {
+      animation: drawPath 500ms cubic-bezier(0.4,0,0.2,1) 320ms forwards;
+    }
+    @keyframes drawPath {
+      to { stroke-dashoffset: 0; }
+    }
+    .loader__wordmark {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: rgba(247,241,232,0.45);
+      opacity: 0;
+      animation: loaderWordIn 600ms ease 600ms forwards;
+    }
+    @keyframes loaderLogoIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes loaderWordIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Page loader — shows until React mounts + brief delay -->
+  <div id="umbria-loader">
+    <img class="loader__logo" src="assets/logos/umbria-estudio-cream.png" alt="Umbría Studio"
+         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+    <!-- Fallback SVG chevrons if logo PNG not found -->
+    <svg class="loader__chevron" style="display:none" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 40 L32 16 L56 40" />
+      <path d="M8 54 L32 30 L56 54" />
+    </svg>
+    <div class="loader__wordmark">Umbría Studio</div>
+  </div>
+
+  <div id="root"></div>
+
+  <!-- Dismiss loader: waits for Framer Motion to load so first paint has real animations -->
+  <script>
+    (function() {
+      var dismissed = false;
+      function dismissLoader() {
+        if (dismissed) return;
+        dismissed = true;
+        var l = document.getElementById('umbria-loader');
+        if (l) l.classList.add('loader--done');
+      }
+      // Primary: dismiss after FM loads — guarantees real motion on first paint
+      window.addEventListener('fm-ready', function() { setTimeout(dismissLoader, 180); });
+      // Fallback: window.load + extra time (if FM is slow)
+      window.addEventListener('load', function() { setTimeout(dismissLoader, 1400); });
+      // Safety: dismiss at 5s max
+      setTimeout(dismissLoader, 5000);
+    })();
+  </script>
+
+  <!-- React -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <!-- Framer Motion: sync fallback (React must be loaded first — strips motion props, renders native elements) -->
+  <script>
+  (function() {
+    var _real = null;
+    var _cache = {};
+    var SKIP = {initial:1,animate:1,exit:1,transition:1,whileHover:1,whileTap:1,whileInView:1,
+      viewport:1,variants:1,layout:1,layoutId:1,drag:1,dragConstraints:1,dragElastic:1,
+      dragMomentum:1,onAnimationStart:1,onAnimationComplete:1,onUpdate:1,whileFocus:1,whileDrag:1,custom:1};
+
+    window.motion = new Proxy({}, {
+      get: function(_, tag) {
+        if (_real) return _real[tag];
+        if (!_cache[tag]) {
+          (function(t) {
+            _cache[t] = function MotionFallback(props) {
+              var p = {};
+              for (var k in props) { if (!SKIP[k]) p[k] = props[k]; }
+              return React.createElement(t, p);
+            };
+            _cache[t].displayName = 'Fallback.' + t;
+          })(tag);
+        }
+        return _cache[tag];
+      }
+    });
+
+    window.AnimatePresence = function(props) { return props.children || null; };
+    window.useInView = function() { return true; };
+
+    window.__fmSetReal = function(fm) {
+      _real = fm.motion;
+      if (fm.AnimatePresence) window.AnimatePresence = fm.AnimatePresence;
+      if (fm.useInView) window.useInView = fm.useInView;
+      window.dispatchEvent(new CustomEvent('fm-ready'));
+    };
+  })();
+  </script>
+
+  <!-- Framer Motion: real ESM import (async — races with Babel components; Proxy handles the gap) -->
+  <script type="module">
+    try {
+      const fm = await import('https://esm.sh/framer-motion@11');
+      window.__fmSetReal(fm);
+    } catch (e) {
+      console.warn('[Umbría] Framer Motion CDN unavailable — CSS animations active:', e);
+      window.dispatchEvent(new CustomEvent('fm-ready'));
+    }
+  </script>
+
+  <!-- Data + placeholders (plain JS) -->
+  <script src="placeholders.js"></script>
+
+  <!-- Claude API mock — respuestas de demo para el chatbot sin necesitar API key -->
+  <script>
+  (function() {
+    const RESPONSES = {
+      boda: "¡Qué emocionante! 💍 Para bodas, Emmanuel trabaja de forma muy personal — ninguna se gestiona por formulario. ¿Cuál es la fecha tentativa? Así le aviso que te contacte directamente por WhatsApp.",
+      familia: "Perfecto! Para sesiones familiares tenemos paquetes desde $70.000 (10 fotos) hasta $200.000 con photobook físico. ¿Cuántas personas serían? Así te recomiendo el pack ideal.",
+      maquillaje: "Rosa es increíble 💄 Para maquillaje de novia tenemos dos opciones: Novia Esencial ($180.000) y Novia Atelier ($280.000, incluye mamá de la novia). ¿Es para una boda o una sesión de fotos?",
+      precio: "¡Con gusto! Las sesiones parten en $70.000 (familiar básico) hasta $250.000 (marca personal premium). Para bodas te paso al equipo directamente. ¿Qué servicio te interesa más?",
+      contacto: "Puedes escribirnos directo al +56 9 5833 5416 por WhatsApp 📱 o usar el formulario de contacto abajo. Emmanuel y Rosa responden en persona — nunca una automatización.",
+      grado: "¡Qué lindo logro! 🎓 Cubrimos graduaciones con paquetes de $350.000 (Esencial, 2h) y $650.000 (Completa, 4h + video + photobook). ¿Es colegio, instituto o universidad?",
+      default: "¡Hola! Con gusto te ayudo ✨ Puedo orientarte sobre bodas, sesiones familiares, maquillaje, graduaciones o producción audiovisual. ¿Qué tienes en mente?",
+    };
+    const pick = (text) => {
+      const t = text.toLowerCase();
+      if (t.includes("boda") || t.includes("matrimon") || t.includes("nupcia")) return "boda";
+      if (t.includes("famil") || t.includes("sesion") || t.includes("sesión") || t.includes("foto")) return "familia";
+      if (t.includes("maquillaje") || t.includes("novia") || t.includes("rosa") || t.includes("makeup")) return "maquillaje";
+      if (t.includes("precio") || t.includes("costo") || t.includes("cuánto") || t.includes("cuanto") || t.includes("valor")) return "precio";
+      if (t.includes("contacto") || t.includes("whatsapp") || t.includes("llamar") || t.includes("hablar")) return "contacto";
+      if (t.includes("grad") || t.includes("titulo") || t.includes("colegio") || t.includes("universi")) return "grado";
+      return "default";
+    };
+    window.claude = {
+      complete: (prompt) => new Promise((resolve) => {
+        const match = prompt.match(/Usuario pregunta: "([^"]+)"/);
+        const q = match ? match[1] : prompt;
+        const key = pick(q);
+        setTimeout(() => resolve(RESPONSES[key]), 800 + Math.random() * 700);
+      })
+    };
+  })();
+  </script>
+
+  <!-- Tweaks panel -->
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+
+  <!-- Magazines data (depends on placeholders + must run before sections) -->
+  <script type="text/babel" src="magazines-data.js"></script>
+
+  <!-- Magazine page renderer + flipbook -->
+  <script type="text/babel" src="magazine-page.jsx"></script>
+  <script type="text/babel" src="flipbook.jsx"></script>
+
+  <!-- Sections -->
+  <script type="text/babel" src="sections-1-v2.jsx"></script>
+  <script type="text/babel" src="sections-2.jsx"></script>
+  <script type="text/babel" src="sections-3-v2.jsx"></script>
+  <script type="text/babel" src="floats.jsx"></script>
+
+  <!-- Main app -->
+  <script type="text/babel" src="app-v2.jsx"></script>
+</body>
+</html>

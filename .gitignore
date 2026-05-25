@@ -1,0 +1,13 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Scratch / temp
+scratch/
+screenshots/
+
+# Local uploads (client photos — not committed)
+uploads/
+
+# Node (if ever added)
+node_modules/

@@ -1,0 +1,425 @@
+/* ============================================
+   MAGAZINE PAGE STYLES — Inside flip-book
+   ============================================ */
+
+.mag-page {
+  width: 100%;
+  height: 100%;
+  background: var(--cream);
+  color: var(--ink);
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  font-family: var(--sans);
+  container-type: inline-size;
+  container-name: magpage;
+}
+.mag-page__folio {
+  position: absolute;
+  bottom: clamp(10px, 1.2vw, 16px);
+  left: clamp(18px, 2vw, 26px); right: clamp(18px, 2vw, 26px);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--sans);
+  font-size: clamp(9px, 0.78vw, 11px);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.7;
+  z-index: 3;
+  pointer-events: none;
+}
+.mag-page[data-side="right"] .mag-page__folio { flex-direction: row-reverse; }
+
+/* ---- COVER ---- */
+.mag-page__cover {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center;
+  color: var(--cream);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(20px, 3vw, 36px) clamp(18px, 2.6vw, 32px);
+}
+.mag-page__cover-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(10,10,10,0.45) 0%, rgba(10,10,10,0.1) 30%, rgba(10,10,10,0.4) 60%, rgba(10,10,10,0.85));
+  z-index: 1;
+}
+.mag-page__cover > *:not(.mag-page__cover-overlay) { position: relative; z-index: 2; }
+.mag-page__cover-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: clamp(7px, 1.9cqw, 11px);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+.mag-page__masthead {
+  font-family: var(--magazine);
+  font-style: italic;
+  font-stretch: 100%;
+  font-size: clamp(11px, 3.4cqw, 18px);
+  letter-spacing: 0.04em;
+  color: var(--champagne);
+  white-space: nowrap;
+}
+.mag-page__cover-headline {
+  margin-bottom: 30px;
+}
+.mag-page__cover-title {
+  font-family: var(--magazine);
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: clamp(28px, 14cqw, 64px);
+  line-height: 0.88;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+.mag-page__cover-title em {
+  font-style: italic;
+  font-stretch: 100%;
+  font-weight: 400;
+  color: var(--champagne);
+  display: block;
+}
+.mag-page__cover-script {
+  font-family: var(--script);
+  font-size: clamp(22px, 9cqw, 42px);
+  color: var(--champagne);
+  margin-top: 14px;
+  line-height: 1;
+}
+.mag-page__cover-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-size: clamp(8px, 2cqw, 11px);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  border-top: 1px solid rgba(247,241,232,0.3);
+  padding-top: 12px;
+}
+
+/* ---- FULL IMAGE ---- */
+.mag-page__full {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+.mag-page__caption {
+  position: absolute;
+  left: clamp(20px, 3vw, 32px); right: clamp(20px, 3vw, 32px);
+  bottom: clamp(34px, 4vw, 52px);
+  background: rgba(247, 241, 232, 0.94);
+  padding: clamp(14px, 1.6vw, 20px) clamp(16px, 1.8vw, 22px);
+  max-width: 70%;
+}
+.mag-page__caption-text {
+  font-family: var(--magazine);
+  font-style: italic;
+  font-stretch: 100%;
+  font-size: clamp(14px, 1.3vw, 18px);
+  line-height: 1.35;
+  margin-top: 6px;
+}
+
+/* ---- SPLIT (image + text) ---- */
+.mag-page__split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100%;
+}
+.mag-page__split-image {
+  background-size: cover;
+  background-position: center;
+}
+.mag-page__split-text {
+  padding: clamp(24px, 3vw, 44px) clamp(20px, 2.4vw, 32px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+}
+.mag-page__h {
+  font-family: var(--magazine);
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: clamp(24px, 10cqw, 46px);
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+.mag-page__h em {
+  font-style: italic;
+  font-stretch: 100%;
+  font-weight: 400;
+  color: var(--champagne-deep);
+  display: block;
+}
+.mag-page__script {
+  font-family: var(--script);
+  font-size: clamp(20px, 8cqw, 36px);
+  color: var(--champagne-deep);
+  line-height: 1;
+}
+.mag-page__body {
+  font-size: clamp(12px, 3.4cqw, 15px);
+  line-height: 1.65;
+  color: var(--muted);
+}
+.mag-page__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: clamp(12px, 3.2cqw, 15px);
+  line-height: 1.5;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.mag-page__list li {
+  padding-left: 16px;
+  position: relative;
+}
+.mag-page__list li::before {
+  content: "—";
+  position: absolute; left: 0;
+  color: var(--champagne-deep);
+}
+
+/* ---- TWO COLUMN ---- */
+.mag-page__two-col {
+  padding: clamp(28px, 3.5vw, 48px) clamp(22px, 2.6vw, 36px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.mag-page__cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(18px, 2vw, 28px);
+  margin-top: auto;
+}
+.mag-page__cols p {
+  font-size: clamp(13px, 1.1vw, 15px);
+  line-height: 1.7;
+  color: var(--muted);
+}
+.mag-page__cols p:first-child::first-letter {
+  font-family: var(--magazine);
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: clamp(48px, 5.5vw, 72px);
+  line-height: 0.8;
+  float: left;
+  padding: 6px 12px 0 0;
+  color: var(--champagne-deep);
+}
+
+/* ---- PACKAGE ---- */
+.mag-page__pkg {
+  padding: clamp(26px, 3.4vw, 44px) clamp(22px, 2.6vw, 36px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.mag-page__pkg-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 28px;
+}
+.mag-page__pkg-no {
+  font-family: var(--magazine);
+  font-style: italic;
+  font-stretch: 100%;
+  font-size: clamp(20px, 2vw, 26px);
+  color: var(--champagne-deep);
+}
+.mag-page__pkg-name {
+  font-family: var(--magazine);
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: clamp(28px, 11cqw, 54px);
+  letter-spacing: -0.025em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+.mag-page__pkg-name em {
+  font-style: italic;
+  font-stretch: 100%;
+  font-weight: 400;
+  color: var(--champagne-deep);
+  display: block;
+}
+.mag-page__pkg-price {
+  font-family: var(--magazine);
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: clamp(54px, 22cqw, 110px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  margin: 24px 0 8px;
+}
+.mag-page__pkg-price .cur {
+  font-size: clamp(20px, 7cqw, 38px);
+  font-style: italic;
+  font-stretch: 100%;
+  font-weight: 400;
+  vertical-align: top;
+  color: var(--champagne-deep);
+  margin-right: 6px;
+}
+.mag-page__pkg-price .unit {
+  font-family: var(--sans);
+  font-size: clamp(10px, 2.6cqw, 13px);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  color: var(--muted);
+  vertical-align: middle;
+  margin-left: 12px;
+}
+.mag-page__pkg-line {
+  height: 1px;
+  background: var(--champagne);
+  margin: 20px 0 24px;
+  width: 72px;
+}
+.mag-page__pkg-note {
+  margin-top: auto;
+  font-size: clamp(10px, 0.85vw, 12px);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+/* ---- QUOTE ---- */
+.mag-page__quote {
+  padding: clamp(40px, 5vw, 80px) clamp(28px, 4vw, 64px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: var(--ink);
+  color: var(--cream);
+}
+.mag-page__quote-mark {
+  font-family: var(--magazine);
+  font-size: clamp(80px, 11vw, 160px);
+  color: var(--champagne);
+  line-height: 0.5;
+  margin-bottom: 30px;
+}
+/* Hide folio on cover layout (cover has its own bottom matter) */
+.mag-page--cover .mag-page__folio,
+.mag-page--fullImage .mag-page__folio { display: none; }
+
+.mag-page__quote-text {
+  font-family: var(--magazine);
+  font-style: italic;
+  font-stretch: 100%;
+  font-weight: 400;
+  font-size: clamp(20px, 7cqw, 38px);
+  line-height: 1.3;
+  max-width: 480px;
+}
+.mag-page__quote-by {
+  margin-top: 34px;
+  font-size: clamp(10px, 0.9vw, 12px);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--champagne);
+}
+
+/* ---- INDEX ---- */
+.mag-page__index {
+  padding: clamp(20px, 3vw, 44px) clamp(20px, 2.6vw, 36px) clamp(28px, 3vw, 40px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.mag-page__index .mag-page__h {
+  font-size: clamp(20px, 8.5cqw, 38px);
+  margin-bottom: clamp(16px, 3vw, 28px) !important;
+}
+.mag-page__index-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.2cqw, 14px);
+}
+.mag-page__index-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: clamp(11px, 3cqw, 15px);
+  padding: 4px 0;
+}
+.mag-page__index-num {
+  font-family: var(--magazine);
+  font-style: italic;
+  font-stretch: 100%;
+  font-size: clamp(13px, 3.4cqw, 18px);
+  color: var(--champagne-deep);
+  width: 30px;
+}
+.mag-page__index-name {
+  font-family: var(--magazine);
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: clamp(12px, 3.4cqw, 16px);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.mag-page__index-dots {
+  flex: 1;
+  border-bottom: 1px dotted var(--line-strong);
+  margin: 0 10px;
+  align-self: flex-end;
+  height: 8px;
+}
+.mag-page__index-page {
+  font-family: var(--magazine);
+  font-style: italic;
+  font-stretch: 100%;
+  font-size: clamp(14px, 4.2cqw, 20px);
+  color: var(--muted);
+}
+
+/* ---- CREDITS ---- */
+.mag-page__credits {
+  padding: clamp(40px, 5vw, 72px) clamp(28px, 3vw, 40px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: var(--cream-deep);
+}
+.mag-page__credits-monogram {
+  font-family: var(--magazine);
+  font-weight: 800;
+  font-stretch: 75%;
+  font-style: italic;
+  font-size: clamp(96px, 14vw, 180px);
+  color: var(--champagne-deep);
+  line-height: 0.8;
+}
+
+/* Blank pages */
+.flipbook__page.blank {
+  background: var(--cream);
+  background-image:
+    radial-gradient(ellipse at center, rgba(247,241,232,1) 60%, rgba(239,230,213,1) 100%);
+}
+.flipbook__page.is-flying-front,
+.flipbook__page.is-flying-back {
+  width: 100% !important;
+  height: 100% !important;
+}
