@@ -370,5 +370,48 @@ Cada una tiene ~8-12 páginas con layouts variados (portada, precios, galería, 
 
 ---
 
+---
+
+## 12. Conexión Automatizatech
+
+Este proyecto es un **entregable del pipeline de Automatizatech** — la agencia de automatización IA que generó y gestiona este cliente.
+
+### Posición en el pipeline AT
+
+```
+Paso 1 ✅  Demo con Emmanuel & Rosa
+Paso 2 ✅  Propuesta generada (precio de desarrollo)
+Paso 3 ✅  Prototipo Claude Design entregado  ← ESTE REPO
+Paso 4 🔄  Revisión & aprobación cliente (pendiente)
+Paso 5 ⏳  Ejecución → invocar skill at-dev-kickoff
+Paso 6 ⏳  Conversión a cliente definitivo
+```
+
+### Cuando el cliente apruebe
+
+Invocar skill `at-dev-kickoff` en el entorno de Claude Code:
+```
+/at-dev-kickoff
+```
+Esto inicia la definición técnica del scope real de desarrollo.
+
+### Memoria y contexto compartido
+
+- **Claude memory:** `C:\Users\luis_\.claude\projects\C--Users-luis-\memory\project_umbria_studio.md`
+- **Obsidian vault:** `C:\Users\luis_\Documents\Codex\AI-Memory-Vault\10-Projects\Umbria-Studio.md`
+- **Project Index:** `C:\Users\luis_\Documents\Codex\AI-Memory-Vault\10-Projects\Project-Index.md`
+
+### Agentes en paralelo
+
+| Agente | Cómo trabaja |
+|--------|-------------|
+| **Claude** | Diseño, arquitectura, sesiones largas |
+| **Codex** | Features nuevos, lee este AGENTS.md, hace PRs a `develop` |
+| **GitHub Copilot** | Completions inline, code review |
+
+> Todos hacen PRs o commits a `develop`. Merge a `main` solo cuando estable.
+
+---
+
 *Generado automáticamente al cierre de la sesión de diseño — Mayo 2026*
 *Claude Sonnet 4.6 + Luis Gómez · Automatizatech*

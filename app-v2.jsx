@@ -4,6 +4,17 @@
 
 const { useState, useEffect, useRef } = React;
 
+// ── Error Boundary (class component — required by React API) ──
+class SectionBoundary extends React.Component {
+  constructor(p) { super(p); this.state = { err: null }; }
+  static getDerivedStateFromError(err) { return { err }; }
+  componentDidCatch(err) { console.error('[Umbría] Section render error:', err); }
+  render() {
+    if (this.state.err) return null; // hide broken section, rest of page keeps working
+    return this.props.children;
+  }
+}
+
 const DEFAULT_TWEAKS = /*EDITMODE-BEGIN*/{
   "heroImage": "weddingGolden",
   "accent": "champagne",
@@ -80,8 +91,8 @@ function App() {
   const [openMag, setOpenMag] = useState(tweaks.flipbookOpenDefault || null);
   const [chatOpen, setChatOpen] = useState(!!tweaks.chatOpenDefault);
 
-  // Re-render once when Framer Motion finishes loading — switches all motion.* from
-  // fallback (native elements) to real FM components, which triggers entrance animations.
+  // Re-render once when Framer Motion finishes loading — switches motion.* Proxy
+  // from fallback (native elements) to real FM components for entrance animations.
   const [, setFmTick] = useState(0);
   useEffect(() => {
     const onFmReady = () => setFmTick(t => t + 1);
@@ -117,22 +128,22 @@ function App() {
       <window.UmbriaHeader scrolled={scrolled} isDark={isDark} />
 
       <main>
-        <window.UmbriaHero heroImage={heroImage} />
-        <window.UmbriaUniverso />
-        <window.UmbriaHistoria />
-        <window.UmbriaBodas />
-        <window.UmbriaPaquetes />
-        <window.UmbriaRosaUmbria />
-        <window.UmbriaVidaGrado />
-        <window.UmbriaAudiovisual />
-        <window.UmbriaProceso />
-        <window.UmbriaBiblioteca onOpenMagazine={(id) => setOpenMag(id)} />
-        <window.UmbriaTestimonios />
-        <window.UmbriaInstagram />
-        <window.UmbriaContacto />
+        <SectionBoundary><window.UmbriaHero heroImage={heroImage} /></SectionBoundary>
+        <SectionBoundary><window.UmbriaUniverso /></SectionBoundary>
+        <SectionBoundary><window.UmbriaHistoria /></SectionBoundary>
+        <SectionBoundary><window.UmbriaBodas /></SectionBoundary>
+        <SectionBoundary><window.UmbriaPaquetes /></SectionBoundary>
+        <SectionBoundary><window.UmbriaRosaUmbria /></SectionBoundary>
+        <SectionBoundary><window.UmbriaVidaGrado /></SectionBoundary>
+        <SectionBoundary><window.UmbriaAudiovisual /></SectionBoundary>
+        <SectionBoundary><window.UmbriaProceso /></SectionBoundary>
+        <SectionBoundary><window.UmbriaBiblioteca onOpenMagazine={(id) => setOpenMag(id)} /></SectionBoundary>
+        <SectionBoundary><window.UmbriaTestimonios /></SectionBoundary>
+        <SectionBoundary><window.UmbriaInstagram /></SectionBoundary>
+        <SectionBoundary><window.UmbriaContacto /></SectionBoundary>
       </main>
 
-      <window.UmbriaFooter />
+      <SectionBoundary><window.UmbriaFooter /></SectionBoundary>
 
       {magazine && <window.FlipBook magazine={magazine} onClose={() => setOpenMag(null)} />}
 

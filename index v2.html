@@ -99,7 +99,7 @@
 
   <div id="root"></div>
 
-  <!-- Dismiss loader: waits for Framer Motion to load so first paint has real animations -->
+  <!-- Dismiss loader after page load + brief delay for React first paint -->
   <script>
     (function() {
       var dismissed = false;
@@ -109,19 +109,17 @@
         var l = document.getElementById('umbria-loader');
         if (l) l.classList.add('loader--done');
       }
-      // Primary: dismiss after FM loads — guarantees real motion on first paint
-      window.addEventListener('fm-ready', function() { setTimeout(dismissLoader, 180); });
-      // Fallback: window.load + extra time (if FM is slow)
-      window.addEventListener('load', function() { setTimeout(dismissLoader, 1400); });
-      // Safety: dismiss at 5s max
+      // Primary: window.load + 600ms (gives React time to mount)
+      window.addEventListener('load', function() { setTimeout(dismissLoader, 600); });
+      // Safety: dismiss at 5s max regardless
       setTimeout(dismissLoader, 5000);
     })();
   </script>
 
-  <!-- React -->
-  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <!-- React — no SRI on CDN scripts (local dev prototype) -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 
   <!-- Framer Motion: sync fallback (React must be loaded first — strips motion props, renders native elements) -->
   <script>
