@@ -92,7 +92,7 @@ function Hero({ heroImage }) {
   return (
     <section className="hero" id="top">
       <div className="hero__bg" ref={ref}>
-        <div className="hero__bg-image" style={{ backgroundImage: `url(${heroImage})` }} />
+        <div className="hero__bg-image" style={{ backgroundImage: heroImage }} />
         <div className="hero__bg-overlay" />
         <div className="hero__grain" />
       </div>
@@ -261,7 +261,7 @@ function Historia() {
           <div className="story__image-wrap">
             <motion.div
               className="story__image"
-              style={{ backgroundImage: `url(assets/team/equipo-formal.jpg), url(${window.umbriaImg("parejas", 71)})` }}
+              style={{ backgroundImage: `url(assets/team/equipo-formal.jpeg), url(${window.umbriaImg("parejas", 71)})` }}
               initial={{ opacity: 0, x: -32 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, amount: 0.15 }}
@@ -271,7 +271,7 @@ function Historia() {
             </motion.div>
             <motion.div
               className="story__image-float"
-              style={{ backgroundImage: `url(assets/team/equipo-divertidos.jpg)` }}
+              style={{ backgroundImage: `url(assets/team/equipo-divertidos.jpeg)` }}
               initial={{ opacity: 0, y: 24, scale: 0.94 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, amount: 0.15 }}

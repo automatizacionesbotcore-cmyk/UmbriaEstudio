@@ -274,7 +274,7 @@ function RosaUmbria() {
           >
             <div
               className="rosa-image"
-              style={{ backgroundImage: `url(assets/team/rosa-evento.jpg), url(${window.umbriaImg("makeup", 91)})` }}
+              style={{ backgroundImage: `url(assets/team/rosa-evento.jpeg), url(${window.umbriaImg("makeup", 91)})` }}
             >
               <div className="rosa-image__badge">Rosa Umbría · Makeup & Hair ✨</div>
             </div>
@@ -381,7 +381,7 @@ function Audiovisual() {
       {/* Real team photo — atmospheric, low opacity, positioned right */}
       <div
         className="av-team-photo"
-        style={{ backgroundImage: `url(assets/team/trabajando.jpg), url(${window.umbriaImg("audiovisual", 111)})` }}
+        style={{ backgroundImage: `url(assets/team/trabajando.jpeg), url(${window.umbriaImg("audiovisual", 111)})` }}
       />
       <div className="container">
         <div className="av-layout reveal">

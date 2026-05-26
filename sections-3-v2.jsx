@@ -70,20 +70,22 @@ const TESTIMONIES = [
     name: "Paulina",
     role: "Sesión Familiar · 2024",
     quote: "Quedamos muy felices con la sesión. Nos encantó su buena onda, paciencia y profesionalismo. Definitivamente volveremos.",
-    // First slot: Emmanuel & Rosa (real team photo, Unsplash fallback)
-    photoBg: () => `url(assets/team/equipo-formal.jpg), url(${window.umbriaImg("parejas", 201)})`,
+    // Real team photo (formal group) — Unsplash fallback if local missing
+    photoBg: () => `url(assets/team/equipo-formal.jpeg), url(${window.umbriaImg("parejas", 201)})`,
   },
   {
     name: "Fernanda & Oscar",
     role: "Boda · 2024",
     quote: "Muy agradecidos por el trabajo que hacen juntos, amamos todas las fotos. Estamos muy emocionados — terminamos siendo familia.",
-    photoBg: () => `url(${window.umbriaImg("weddingGolden", 202)})`,
+    // Real: Emmanuel & Rosa working together with gimbal
+    photoBg: () => `url(assets/team/trabajando.jpeg), url(${window.umbriaImg("weddingGolden", 202)})`,
   },
   {
     name: "Camila",
     role: "Smash Cake · 2024",
     quote: "Pensé que iba a llorar. Se rió y comió torta dos horas. Las fotos son una obra de arte. Gracias por la paciencia infinita.",
-    photoBg: () => `url(${window.umbriaImg("smashCake", 203)})`,
+    // Real: team fun/playful pose
+    photoBg: () => `url(assets/team/equipo-divertidos.jpeg), url(${window.umbriaImg("smashCake", 203)})`,
   },
 ];
 

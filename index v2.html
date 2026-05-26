@@ -159,10 +159,23 @@
   })();
   </script>
 
-  <!-- Framer Motion: real ESM import (async — races with Babel components; Proxy handles the gap) -->
+  <!-- Importmap: redirect FM's "react" / "react-dom" imports to window.React shims.
+       MUST come before any <script type="module">. Fixes "two React instances" crash
+       where FM's bundled react.production.js calls useContext on a different fiber tree. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "react":     "./react-esm-shim.js",
+      "react-dom": "./react-dom-esm-shim.js"
+    }
+  }
+  </script>
+
+  <!-- Framer Motion: real ESM import — ?external=react,react-dom tells esm.sh to
+       import React from our shim (window.React) instead of bundling its own copy. -->
   <script type="module">
     try {
-      const fm = await import('https://esm.sh/framer-motion@11');
+      const fm = await import('https://esm.sh/framer-motion@11.18.2?external=react,react-dom');
       window.__fmSetReal(fm);
     } catch (e) {
       console.warn('[Umbría] Framer Motion CDN unavailable — CSS animations active:', e);

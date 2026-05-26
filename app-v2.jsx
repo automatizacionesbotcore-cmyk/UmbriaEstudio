@@ -16,7 +16,7 @@ class SectionBoundary extends React.Component {
 }
 
 const DEFAULT_TWEAKS = /*EDITMODE-BEGIN*/{
-  "heroImage": "weddingGolden",
+  "heroImage": "emmanuelRosa",
   "accent": "champagne",
   "viewport": "desktop",
   "chatOpenDefault": false,
@@ -119,7 +119,10 @@ function App() {
     return () => { document.body.style.overflow = ""; };
   }, [openMag]);
 
-  const heroImage = window.umbriaImg(tweaks.heroImage || "weddingGolden", 1);
+  // Local photos take priority; Unsplash URL as CSS fallback layer
+  const heroImage = tweaks.heroImage === "emmanuelRosa"
+    ? `url(assets/team/trabajando.jpeg), url(${window.umbriaImg("weddingMoody", 1)})`
+    : `url(${window.umbriaImg(tweaks.heroImage || "weddingGolden", 1)})`;
   const magazine = openMag ? window.UMBRIA_GET_MAG(openMag) : null;
 
   return (
@@ -157,6 +160,7 @@ function App() {
           value={tweaks.heroImage}
           onChange={(v) => setTweak("heroImage", v)}
           options={[
+            { value: "emmanuelRosa", label: "E & R" },
             { value: "weddingGolden", label: "Golden" },
             { value: "weddingBW", label: "B&W" },
             { value: "weddingMoody", label: "Moody" },
