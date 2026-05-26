@@ -101,72 +101,120 @@ const PACKS = {
   ],
 };
 
+// Icon helpers for pack features
+function IconCheck({ featured }) {
+  return (
+    <span className={`pkc__check ${featured ? "pkc__check--inv" : ""}`}>
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none"
+        stroke="currentColor" strokeWidth="2.2"
+        strokeLinecap="round" strokeLinejoin="round">
+        <path d="M1.5 5.5 L4 8.5 L9.5 2"/>
+      </svg>
+    </span>
+  );
+}
+
 function Paquetes() {
   const [tab, setTab] = useState2("familiar");
+
+  const packs = PACKS[tab];
+  const tabMeta = TABS.find(t => t.id === tab) || TABS[0];
 
   return (
     <section className="section section--cream" id="estudio">
       <div className="container">
-        <div className="section-head reveal">
+
+        <div className="section-head reveal" style={{ textAlign: "center" }}>
           <div className="eyebrow">Sesiones · Precios 2026</div>
           <h2>
             SESIONES QUE<br/>
-            <em>se ajustan a tu momento</em>
+            <em>se ajustan a ti</em>
           </h2>
+          <p style={{ maxWidth: 440, margin: "12px auto 0", fontSize: 15, color: "var(--ink-soft)" }}>
+            Elige la categoría y encuentra el paquete ideal para tu momento.
+          </p>
         </div>
 
-        <div className="packs__tabs">
-          {TABS.map(t => (
-            <button
-              key={t.id}
-              className={`packs__tab ${tab === t.id ? "is-active" : ""}`}
-              onClick={() => setTab(t.id)}
-            >
-              {t.label}
-              {tab === t.id && (
-                <motion2.span
-                  layoutId="pack-tab-ind"
-                  className="packs__tab-indicator"
-                  transition={{ type: "spring", stiffness: 420, damping: 36 }}
-                />
-              )}
-            </button>
-          ))}
-        </div>
-
-        <div className="packs__grid stagger in" key={tab}>
-          {PACKS[tab].map((p, i) => (
-            <div key={i} className={`pack ${p.featured ? "is-featured" : ""}`}>
-              {p.badge && <div className="pack__badge">★ {p.badge}</div>}
-              <div className="pack__cat">{p.cat}</div>
-              <h3 className="pack__name">
-                {p.name.map((n, j) =>
-                  j === 1
-                    ? <em key={j}> {n}</em>
-                    : <span key={j}>{j > 0 ? " " : ""}{n}</span>
+        {/* ── Category pill tabs ── */}
+        <div className="pkc__tabs-wrap">
+          <div className="pkc__tabs">
+            {TABS.map(t => (
+              <button
+                key={t.id}
+                className={`pkc__tab ${tab === t.id ? "is-active" : ""}`}
+                onClick={() => setTab(t.id)}
+                aria-pressed={tab === t.id}
+              >
+                {tab === t.id && (
+                  <motion2.span
+                    layoutId="pkc-pill"
+                    className="pkc__pill"
+                    transition={{ type: "spring", stiffness: 480, damping: 38 }}
+                  />
                 )}
-              </h3>
-              <div className="pack__price"><span className="cur">$</span>{p.price}</div>
-              <ul className="pack__includes">
+                <span className="pkc__tab-label">{t.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Pack cards ── */}
+        <div className="pkc__grid" key={tab}>
+          {packs.map((p, i) => (
+            <div key={i} className={`pkc__card ${p.featured ? "pkc__card--featured" : ""}`}>
+
+              {p.badge && (
+                <div className="pkc__badge">★ {p.badge}</div>
+              )}
+
+              {/* Head */}
+              <div className="pkc__head">
+                <div className="pkc__cat">{p.cat}</div>
+                <h3 className="pkc__name">
+                  {p.name.map((n, j) =>
+                    j === 1
+                      ? <em key={j}><br/>{n}</em>
+                      : <span key={j}>{n}</span>
+                  )}
+                </h3>
+              </div>
+
+              {/* Price — key on tab+i triggers CSS animation on category change */}
+              <div className="pkc__price-row" key={`${tab}-${i}`}>
+                <span className="pkc__cur">$</span>
+                <span className="pkc__amount">{p.price}</span>
+                <span className="pkc__period">CLP</span>
+              </div>
+
+              {/* Features */}
+              <ul className="pkc__list">
                 {p.list.map((it, j) => (
                   <li key={j}>
-                    <span className="pack__check">
-                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M1.5 5 L4 7.5 L8.5 2"/>
-                      </svg>
-                    </span>
-                    {it}
+                    <IconCheck featured={p.featured} />
+                    <span>{it}</span>
                   </li>
                 ))}
               </ul>
-              <div className="pack__cta">
-                <button className={`btn ${p.featured ? "btn--gold" : ""}`}>
-                  {p.cat.includes("Novia") ? "Reservar prueba" : "Reservar este pack"}
-                </button>
+
+              {/* CTA */}
+              <div className="pkc__cta">
+                <a href="#contacto" className={`btn ${p.featured ? "btn--gold" : "btn--outline"}`}>
+                  {p.cat.toLowerCase().includes("rosa") || p.cat.toLowerCase().includes("novia")
+                    ? "Reservar prueba"
+                    : "Reservar este pack"}
+                </a>
               </div>
+
             </div>
           ))}
         </div>
+
+        {/* Bottom note */}
+        <p className="pkc__note">
+          Precios en CLP · IVA incluido · 50% adelanto para reservar fecha
+          · <a href="#contacto" style={{ color: "var(--copper)" }}>Consultar por bodas →</a>
+        </p>
+
       </div>
     </section>
   );
