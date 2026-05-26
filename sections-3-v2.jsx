@@ -21,9 +21,18 @@ function Biblioteca({ onOpenMagazine }) {
           <div className="script">hojea nuestros catálogos como una revista impresa</div>
         </div>
 
-        <div className="library__grid stagger reveal">
+        <div className="library__grid">
           {mags.map((m, i) => (
-            <div className="mag-card" key={m.id} onClick={() => onOpenMagazine(m.id)}>
+            <motion3.div
+              className="mag-card"
+              key={m.id}
+              onClick={() => onOpenMagazine(m.id)}
+              initial={{ opacity: 0, y: 44, scale: 0.97 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, amount: 0.08 }}
+              transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94], delay: i * 0.1 }}
+              whileHover={{ y: -10, scale: 1.02, transition: { duration: 0.3 } }}
+            >
               <div className="mag-cover">
                 <div className="mag-cover__inner" style={{ backgroundImage: `url(${m.coverImage})`, backgroundSize: "cover", backgroundPosition: "center" }}>
                   <div className="mag-cover__top">
@@ -56,7 +65,7 @@ function Biblioteca({ onOpenMagazine }) {
                 </div>
                 <div className="mag-meta__pages">Hojear ↗</div>
               </div>
-            </div>
+            </motion3.div>
           ))}
         </div>
       </div>
@@ -65,151 +74,162 @@ function Biblioteca({ onOpenMagazine }) {
 }
 
 // ============== TESTIMONIOS ==============
-const TESTIMONIES = [
+const TESTIMONIES_V3 = [
   {
+    id: 1,
     name: "Paulina",
     role: "Sesión Familiar · 2024",
     quote: "Quedamos muy felices con la sesión. Nos encantó su buena onda, paciencia y profesionalismo. Definitivamente volveremos.",
-    // Real team photo (formal group) — Unsplash fallback if local missing
-    photoBg: () => `url(assets/team/equipo-formal.jpeg), url(${window.umbriaImg("parejas", 201)})`,
+    img: () => window.umbriaImg("parejas", 201),
+    thumb: () => window.umbriaImg("parejas", 231),
   },
   {
+    id: 2,
     name: "Fernanda & Oscar",
     role: "Boda · 2024",
     quote: "Muy agradecidos por el trabajo que hacen juntos, amamos todas las fotos. Estamos muy emocionados — terminamos siendo familia.",
-    // Real: Emmanuel & Rosa working together with gimbal
-    photoBg: () => `url(assets/team/trabajando.jpeg), url(${window.umbriaImg("weddingGolden", 202)})`,
+    img: () => window.umbriaImg("weddingGolden", 202),
+    thumb: () => window.umbriaImg("weddingGolden", 232),
   },
   {
+    id: 3,
     name: "Camila",
     role: "Smash Cake · 2024",
     quote: "Pensé que iba a llorar. Se rió y comió torta dos horas. Las fotos son una obra de arte. Gracias por la paciencia infinita.",
-    // Real: team fun/playful pose
-    photoBg: () => `url(assets/team/equipo-divertidos.jpeg), url(${window.umbriaImg("smashCake", 203)})`,
+    img: () => window.umbriaImg("smashCake", 203),
+    thumb: () => window.umbriaImg("smashCake", 233),
+  },
+  {
+    id: 4,
+    name: "Valentina",
+    role: "Maquillaje Novia · 2024",
+    quote: "Rosa tiene magia en sus manos. Mi look de novia superó todas mis expectativas. Mis invitados no me reconocían.",
+    img: () => window.umbriaImg("portrait", 204),
+    thumb: () => window.umbriaImg("portrait", 234),
   },
 ];
 
 function Testimonios() {
   const [activeIdx, setActiveIdx] = useState3(0);
-  const [containerW, setContainerW] = useState3(500);
-  const fanRef = useRef3(null);
+  const [dir, setDir] = useState3("next");
   const timerRef = useRef3(null);
-  const n = TESTIMONIES.length;
+  const n = TESTIMONIES_V3.length;
   const AnimPres = window.AnimatePresence;
 
-  // Measure fan container width for responsive gap calc
-  useEffect3(() => {
-    const measure = () => { if (fanRef.current) setContainerW(fanRef.current.offsetWidth); };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, []);
-
-  // Autoplay — reset on manual nav
   const startTimer = () => {
     clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => setActiveIdx(v => (v + 1) % n), 6500);
+    timerRef.current = setInterval(() => {
+      setDir("next");
+      setActiveIdx(v => (v + 1) % n);
+    }, 6000);
   };
   useEffect3(() => { startTimer(); return () => clearInterval(timerRef.current); }, [n]);
 
-  const goNext = () => { setActiveIdx(v => (v + 1) % n); startTimer(); };
-  const goPrev = () => { setActiveIdx(v => (v - 1 + n) % n); startTimer(); };
+  const goNext = () => { setDir("next"); setActiveIdx(v => (v + 1) % n); startTimer(); };
+  const goPrev = () => { setDir("prev"); setActiveIdx(v => (v - 1 + n) % n); startTimer(); };
 
-  // 3D fan transform per photo (left/center/right pattern)
-  const getPhotoStyle = (idx) => {
-    const gap = Math.min(containerW * 0.16, 68);
-    const stickUp = gap * 0.72;
-    const isCenter = idx === activeIdx;
-    const isLeft  = (activeIdx - 1 + n) % n === idx;
-    const isRight = (activeIdx + 1) % n === idx;
-    if (isCenter) return {
-      zIndex: 3, opacity: 1, pointerEvents: "auto",
-      transform: "translateX(0) translateY(0) scale(1) rotateY(0deg)",
-      transition: "all 0.78s cubic-bezier(.4,1.4,.55,1)",
-    };
-    if (isLeft) return {
-      zIndex: 2, opacity: 1, pointerEvents: "auto",
-      transform: `translateX(-${gap}px) translateY(-${stickUp}px) scale(0.83) rotateY(13deg)`,
-      transition: "all 0.78s cubic-bezier(.4,1.4,.55,1)",
-    };
-    if (isRight) return {
-      zIndex: 2, opacity: 1, pointerEvents: "auto",
-      transform: `translateX(${gap}px) translateY(-${stickUp}px) scale(0.83) rotateY(-13deg)`,
-      transition: "all 0.78s cubic-bezier(.4,1.4,.55,1)",
-    };
-    return { zIndex: 1, opacity: 0, pointerEvents: "none", transition: "all 0.78s" };
+  const t = TESTIMONIES_V3[activeIdx];
+  const thumbs = TESTIMONIES_V3.filter((_, i) => i !== activeIdx).slice(0, 3);
+
+  const imgVar = {
+    enter:  (d) => ({ y: d === "next" ? "110%" : "-110%", opacity: 0 }),
+    center: { y: 0, opacity: 1 },
+    exit:   (d) => ({ y: d === "next" ? "-110%" : "110%", opacity: 0 }),
+  };
+  const txtVar = {
+    enter:  (d) => ({ x: d === "next" ? 46 : -46, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit:   (d) => ({ x: d === "next" ? -46 : 46, opacity: 0 }),
   };
 
-  const t = TESTIMONIES[activeIdx];
-
   return (
-    <section className="section testimonials-v2" id="testimonios">
+    <section className="section tsv3" id="testimonios">
       <div className="container">
-        <div className="section-head reveal" style={{ textAlign: "center" }}>
-          <div className="eyebrow">Lo que dicen</div>
-          <h2 style={{ fontSize: "clamp(36px, 5vw, 64px)" }}>
-            HISTORIAS <em>contadas</em>
-          </h2>
-        </div>
+        <div className="tsv3__grid">
 
-        <div className="testimonials-v2__grid">
-
-          {/* ── 3D photo fan ── */}
-          <div className="testimonials-v2__fan" ref={fanRef}>
-            {TESTIMONIES.map((item, idx) => (
-              <div
-                key={idx}
-                className="testimonials-v2__photo"
-                style={{ backgroundImage: item.photoBg(), ...getPhotoStyle(idx) }}
-                onClick={() => { setActiveIdx(idx); startTimer(); }}
-              />
-            ))}
+          {/* Left — counter + label + thumbs */}
+          <div className="tsv3__left">
+            <div className="tsv3__meta">
+              <span className="tsv3__counter">
+                {String(activeIdx + 1).padStart(2, "0")} <span className="tsv3__sep">/</span> {String(n).padStart(2, "0")}
+              </span>
+              <span className="tsv3__label">RESEÑAS</span>
+            </div>
+            <div className="tsv3__thumbs">
+              {thumbs.map(item => {
+                const oi = TESTIMONIES_V3.findIndex(x => x.id === item.id);
+                return (
+                  <button
+                    key={item.id}
+                    className="tsv3__thumb"
+                    onClick={() => { setDir(oi > activeIdx ? "next" : "prev"); setActiveIdx(oi); startTimer(); }}
+                    aria-label={`Ver reseña de ${item.name}`}
+                  >
+                    <img src={item.thumb()} alt={item.name} className="tsv3__thumb-img" />
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* ── Quote + nav ── */}
-          <div className="testimonials-v2__content">
-            <AnimPres mode="wait">
+          {/* Center — main image with vertical slide */}
+          <div className="tsv3__img-wrap">
+            <AnimPres initial={false} custom={dir}>
+              <motion3.img
+                key={activeIdx}
+                src={t.img()}
+                alt={t.name}
+                custom={dir}
+                variants={imgVar}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.65, ease: [0.4, 0, 0.2, 1] }}
+                className="tsv3__img"
+              />
+            </AnimPres>
+          </div>
+
+          {/* Right — text + blur words + nav */}
+          <div className="tsv3__content">
+            <AnimPres initial={false} custom={dir} mode="wait">
               <motion3.div
                 key={activeIdx}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="testimonials-v2__body"
+                custom={dir}
+                variants={txtVar}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
+                className="tsv3__text"
               >
-                <div className="testimonials-v2__quote-mark">❝</div>
-                <p className="testimonials-v2__quote">
-                  {t.quote.split(" ").map((word, wi) => (
+                <div className="tsv3__role">{t.role}</div>
+                <div className="tsv3__name">{t.name}</div>
+                <blockquote className="tsv3__quote">
+                  ❝{" "}{t.quote.split(" ").map((word, wi) => (
                     <motion3.span
                       key={wi}
-                      initial={{ filter: "blur(8px)", opacity: 0, y: 4 }}
+                      initial={{ filter: "blur(8px)", opacity: 0, y: 5 }}
                       animate={{ filter: "blur(0px)", opacity: 1, y: 0 }}
-                      transition={{ duration: 0.2, ease: "easeInOut", delay: 0.022 * wi }}
-                      style={{ display: "inline-block", marginRight: "0.26em" }}
+                      transition={{ duration: 0.22, ease: "easeInOut", delay: 0.024 * wi }}
+                      style={{ display: "inline-block", marginRight: "0.25em" }}
                     >
                       {word}
                     </motion3.span>
                   ))}
-                </p>
-                <div className="testimonials-v2__author">
-                  <strong className="testimonials-v2__name">{t.name}</strong>
-                  <span className="testimonials-v2__role">{t.role}</span>
-                </div>
+                </blockquote>
               </motion3.div>
             </AnimPres>
 
-            <div className="testimonials-v2__nav">
-              <button className="testimonials-v2__arrow" onClick={goPrev} aria-label="Anterior">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M10 2 L4 8 L10 14"/>
+            <div className="tsv3__nav">
+              <button className="tsv3__arrow" onClick={goPrev} aria-label="Anterior">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 3 L5 9 L11 15"/>
                 </svg>
               </button>
-              <span className="testimonials-v2__counter">
-                {activeIdx + 1}<span style={{ opacity: 0.38 }}> / {n}</span>
-              </span>
-              <button className="testimonials-v2__arrow" onClick={goNext} aria-label="Siguiente">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M6 2 L12 8 L6 14"/>
+              <button className="tsv3__arrow tsv3__arrow--next" onClick={goNext} aria-label="Siguiente">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 3 L13 9 L7 15"/>
                 </svg>
               </button>
             </div>
@@ -322,7 +342,7 @@ function Instagram() {
               {/* 3×2 photo grid */}
               <div className="ig-col__grid">
                 {acc.photos.map((p, j) => (
-                  <a
+                  <motion3.a
                     key={j}
                     className="ig-col__photo"
                     href={acc.link}
@@ -330,11 +350,16 @@ function Instagram() {
                     rel="noopener noreferrer"
                     aria-label={`Post de @${acc.handle}`}
                     style={{ backgroundImage: `url(${p.fn()})` }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true, amount: 0.1 }}
+                    transition={{ duration: 0.5, ease: "easeOut", delay: j * 0.06 }}
+                    whileHover={{ scale: 1.06, transition: { duration: 0.28 } }}
                   >
                     <div className="ig-col__photo-overlay">
                       <IgIcon />
                     </div>
-                  </a>
+                  </motion3.a>
                 ))}
               </div>
 

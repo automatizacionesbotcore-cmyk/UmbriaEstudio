@@ -65,7 +65,7 @@ function useNavState() {
       setScrolled(window.scrollY > 40);
 
       // Determine if nav overlaps a dark section
-      const darkSections = document.querySelectorAll(".section--dark, .weddings, .library, .contact, .hero");
+      const darkSections = document.querySelectorAll(".section--dark, .weddings, .library, .contact, .hero, .tsv3");
       const navHeight = 60;
       let dark = false;
       darkSections.forEach(s => {
@@ -121,7 +121,7 @@ function App() {
 
   // Local photos take priority; Unsplash URL as CSS fallback layer
   const heroImage = tweaks.heroImage === "emmanuelRosa"
-    ? `url(assets/team/trabajando.jpeg), url(${window.umbriaImg("weddingMoody", 1)})`
+    ? `url(assets/team/er-01.jpeg), url(${window.umbriaImg("weddingMoody", 1)})`
     : `url(${window.umbriaImg(tweaks.heroImage || "weddingGolden", 1)})`;
   const magazine = openMag ? window.UMBRIA_GET_MAG(openMag) : null;
 
@@ -134,6 +134,7 @@ function App() {
         <SectionBoundary><window.UmbriaHero heroImage={heroImage} /></SectionBoundary>
         <SectionBoundary><window.UmbriaUniverso /></SectionBoundary>
         <SectionBoundary><window.UmbriaHistoria /></SectionBoundary>
+        <SectionBoundary><window.UmbriaEquipo /></SectionBoundary>
         <SectionBoundary><window.UmbriaBodas /></SectionBoundary>
         <SectionBoundary><window.UmbriaPaquetes /></SectionBoundary>
         <SectionBoundary><window.UmbriaRosaUmbria /></SectionBoundary>

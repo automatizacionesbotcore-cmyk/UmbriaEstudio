@@ -2,7 +2,7 @@
 // UMBRÍA STUDIO — Sections (Bodas, Packs, Proceso)
 // ============================================
 
-const { useState: useState2, useEffect: useEffect2 } = React;
+const { useState: useState2, useEffect: useEffect2, useRef: useRef2 } = React;
 const motion2 = window.motion;
 
 // ============== BODAS ==============
@@ -21,9 +21,20 @@ function Bodas() {
   return (
     <section className="weddings" id="bodas">
       <div className="weddings__hero">
-        <div className="weddings__bg" style={{ backgroundImage: `url(${window.umbriaImg("weddingBW", 40)})` }} />
+        <motion2.div
+          className="weddings__bg"
+          style={{ backgroundImage: `url(${window.umbriaImg("weddingBW", 40)})` }}
+          initial={{ scale: 1.08 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+        />
         <div className="weddings__hero-inner">
-          <div className="reveal">
+          <motion2.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          >
             <div className="eyebrow">El corazón de Umbría</div>
             <h2>
               BODAS<br/>
@@ -38,13 +49,22 @@ function Bodas() {
                 Ver portafolio <span className="arrow" />
               </a>
             </div>
-          </div>
+          </motion2.div>
         </div>
       </div>
 
       <div className="masonry">
         {masonryImages.map((src, i) => (
-          <div key={i} className="masonry__cell" style={{ backgroundImage: `url(${src})` }} />
+          <motion2.div
+            key={i}
+            className="masonry__cell"
+            style={{ backgroundImage: `url(${src})` }}
+            initial={{ opacity: 0, scale: 0.93 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, amount: 0.06 }}
+            transition={{ duration: 0.72, ease: [0.25, 0.46, 0.45, 0.94], delay: i * 0.07 }}
+            whileHover={{ scale: 1.04, transition: { duration: 0.35 } }}
+          />
         ))}
       </div>
     </section>
@@ -115,10 +135,39 @@ function IconCheck({ featured }) {
 }
 
 function Paquetes() {
-  const [tab, setTab] = useState2("familiar");
+  const [tabIdx, setTabIdx] = useState2(0);
+  const [dir, setDir] = useState2(1);
+  const timerRef = useRef2(null);
+  const AnimPres2 = window.AnimatePresence;
 
+  const tab = TABS[tabIdx].id;
   const packs = PACKS[tab];
-  const tabMeta = TABS.find(t => t.id === tab) || TABS[0];
+
+  function startTimer() {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setDir(1);
+      setTabIdx(prev => (prev + 1) % TABS.length);
+    }, 5500);
+  }
+
+  useEffect2(() => {
+    startTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, []);
+
+  function handleTabClick(idx) {
+    if (idx === tabIdx) return;
+    setDir(idx > tabIdx ? 1 : -1);
+    setTabIdx(idx);
+    startTimer();
+  }
+
+  const gridVariants = {
+    enter: (d) => ({ opacity: 0, x: d > 0 ? 56 : -56 }),
+    center: { opacity: 1, x: 0 },
+    exit: (d) => ({ opacity: 0, x: d > 0 ? -56 : 56 }),
+  };
 
   return (
     <section className="section section--cream" id="estudio">
@@ -138,18 +187,27 @@ function Paquetes() {
         {/* ── Category pill tabs ── */}
         <div className="pkc__tabs-wrap">
           <div className="pkc__tabs">
-            {TABS.map(t => (
+            {TABS.map((t, ti) => (
               <button
                 key={t.id}
-                className={`pkc__tab ${tab === t.id ? "is-active" : ""}`}
-                onClick={() => setTab(t.id)}
-                aria-pressed={tab === t.id}
+                className={`pkc__tab ${tabIdx === ti ? "is-active" : ""}`}
+                onClick={() => handleTabClick(ti)}
+                aria-pressed={tabIdx === ti}
               >
-                {tab === t.id && (
+                {tabIdx === ti && (
                   <motion2.span
                     layoutId="pkc-pill"
                     className="pkc__pill"
                     transition={{ type: "spring", stiffness: 480, damping: 38 }}
+                  />
+                )}
+                {tabIdx === ti && (
+                  <motion2.span
+                    key={`prog-${tabIdx}`}
+                    className="pkc__tab-progress"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 5.5, ease: "linear" }}
                   />
                 )}
                 <span className="pkc__tab-label">{t.label}</span>
@@ -159,9 +217,26 @@ function Paquetes() {
         </div>
 
         {/* ── Pack cards ── */}
-        <div className="pkc__grid" key={tab}>
+        <AnimPres2 mode="wait" custom={dir}>
+          <motion2.div
+            className="pkc__grid"
+            key={tab}
+            custom={dir}
+            variants={gridVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.38, ease: [0.25, 0.46, 0.45, 0.94] }}
+          >
           {packs.map((p, i) => (
-            <div key={i} className={`pkc__card ${p.featured ? "pkc__card--featured" : ""}`}>
+            <motion2.div
+              key={i}
+              className={`pkc__card ${p.featured ? "pkc__card--featured" : ""}`}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.52, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.06 + i * 0.1 }}
+              whileHover={{ y: -5, transition: { duration: 0.25 } }}
+            >
 
               {p.badge && (
                 <div className="pkc__badge">★ {p.badge}</div>
@@ -205,9 +280,10 @@ function Paquetes() {
                 </a>
               </div>
 
-            </div>
+            </motion2.div>
           ))}
-        </div>
+          </motion2.div>
+        </AnimPres2>
 
         {/* Bottom note */}
         <p className="pkc__note">
@@ -243,13 +319,20 @@ function Proceso() {
 
         <div className="process">
           <div className="process__line" />
-          <div className="process__grid stagger reveal">
-            {STEPS.map(s => (
-              <div className="step" key={s.n}>
+          <div className="process__grid">
+            {STEPS.map((s, si) => (
+              <motion2.div
+                className="step"
+                key={s.n}
+                initial={{ opacity: 0, y: 36 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{ duration: 0.58, ease: [0.25, 0.46, 0.45, 0.94], delay: si * 0.13 }}
+              >
                 <div className="step__num">{s.n}</div>
                 <h4 className="step__title">{s.title}</h4>
                 <p className="step__desc">{s.desc}</p>
-              </div>
+              </motion2.div>
             ))}
           </div>
         </div>
@@ -295,10 +378,18 @@ function RosaUmbria() {
                 { price: "$180.000", name: "Novia Esencial" },
                 { price: "$280.000", name: "Novia Atelier ★", featured: true },
               ].map((s, i) => (
-                <div className={`rosa-svc ${s.featured ? "is-featured" : ""}`} key={i}>
+                <motion2.div
+                  className={`rosa-svc ${s.featured ? "is-featured" : ""}`}
+                  key={i}
+                  initial={{ opacity: 0, x: -22 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.5, ease: "easeOut", delay: 0.3 + i * 0.1 }}
+                  whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                >
                   <div className="rosa-svc__price">{s.price}</div>
                   <div className="rosa-svc__name">{s.name}</div>
-                </div>
+                </motion2.div>
               ))}
             </div>
             <div className="hero__ctas" style={{ marginTop: 32 }}>
@@ -333,19 +424,27 @@ function VidaGrado() {
             </p>
           </div>
 
-          <div className="grado-packs stagger">
+          <div className="grado-packs">
             {[
               { no: "01", price: "$350.000", name: "Cobertura Esencial",
                 details: "2h · 2 fotógrafos · 100+ imágenes · portal web privado" },
               { no: "02", price: "$650.000", name: "Cobertura Completa ★", featured: true,
                 details: "4h · 3 fotógrafos · 300+ imágenes · video resumen · photobook" },
             ].map((p, i) => (
-              <div className={`grado-pack ${p.featured ? "is-featured" : ""}`} key={i}>
+              <motion2.div
+                className={`grado-pack ${p.featured ? "is-featured" : ""}`}
+                key={i}
+                initial={{ opacity: 0, y: 32 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.62, ease: [0.25, 0.46, 0.45, 0.94], delay: i * 0.16 }}
+                whileHover={{ y: -5, transition: { duration: 0.25 } }}
+              >
                 <div className="grado-pack__no">{p.no}</div>
                 <div className="grado-pack__price">{p.price}</div>
                 <div className="grado-pack__name">{p.name}</div>
                 <div className="grado-pack__details">{p.details}</div>
-              </div>
+              </motion2.div>
             ))}
           </div>
 
@@ -394,13 +493,21 @@ function Audiovisual() {
             </h2>
           </div>
 
-          <div className="av-services stagger reveal">
+          <div className="av-services">
             {AV_SERVICES.map((s, i) => (
-              <div className="av-item" key={i}>
+              <motion2.div
+                className="av-item"
+                key={i}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94], delay: i * 0.14 }}
+                whileHover={{ y: -4, transition: { duration: 0.22 } }}
+              >
                 <div className="av-item__icon">{s.icon}</div>
                 <h4 className="av-item__title">{s.title}</h4>
                 <p className="av-item__desc">{s.desc}</p>
-              </div>
+              </motion2.div>
             ))}
           </div>
 

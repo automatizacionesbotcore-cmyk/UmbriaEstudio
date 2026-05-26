@@ -53,18 +53,24 @@ El entry point es `index v2.html` (con espacio en el nombre).
 
 En cada archivo JSX:
 ```jsx
-const motion = window.motion;       // captura el Proxy — funciona al render time
-const motion2 = window.motion;      // sections-2.jsx usa motion2
-const motion3 = window.motion;      // sections-3-v2.jsx usa motion3
+const motion = window.motion;       // sections-1-v2.jsx
+const motion2 = window.motion;      // sections-2.jsx
+const motion3 = window.motion;      // sections-3-v2.jsx
+const motionF = window.motion;      // floats.jsx
 ```
 
-`window.AnimatePresence` sigue el mismo patrón — accederlo como `window.AnimatePresence` dentro del componente (no al scope del módulo) para siempre tener la versión real.
+`window.AnimatePresence` — accederlo **dentro del componente** (no a scope de módulo):
+```jsx
+function MiComponente() {
+  const AnimPres = window.AnimatePresence;  // ✅ siempre real al render time
+  ...
+}
+```
 
 ### Patrón de exportación de componentes
 
 **No hay imports entre archivos.** Todo se exporta via `window.*`:
 ```jsx
-// Al final de cada archivo:
 window.UmbriaHeader = Header;
 window.UmbriaHero = Hero;
 // etc.
@@ -78,19 +84,19 @@ window.UmbriaHero = Hero;
 
 ```
 PrototipoClaudeDesign/
-├── index v2.html           ← Entry point PRINCIPAL (con espacio)
+├── index v2.html           ← Entry point PRINCIPAL (con espacio — NO renombrar)
 ├── index.html              ← Versión v1 — no tocar
 │
 ├── app-v2.jsx              ← Root app, render tree, tweaks panel wiring
-├── sections-1-v2.jsx       ← Header, Hero, Universo, Historia
-├── sections-2.jsx          ← Bodas, Paquetes, Proceso, RosaUmbria, VidaGrado, Audiovisual
-├── sections-3-v2.jsx       ← Biblioteca editorial, Testimonios v2, Instagram, Contacto, Footer
+├── sections-1-v2.jsx       ← Header, Hero (con ER carousel), Universo, Historia (card stack), Equipo
+├── sections-2.jsx          ← Bodas, Paquetes (tabs auto-cycling), Proceso, RosaUmbria, VidaGrado, Audiovisual
+├── sections-3-v2.jsx       ← Testimonios v3, Biblioteca editorial, Instagram, Contacto, Footer
 ├── flipbook.jsx            ← Flipbook 3D (drag + click/teclado)
 ├── floats.jsx              ← Chatbot IA + botón WhatsApp
 ├── magazine-page.jsx       ← Renderer de páginas de revista (9 layouts)
 ├── tweaks-panel.jsx        ← Panel de tweaks del harness
 │
-├── styles-v2.css           ← TODO el CSS (~2600 líneas) — no hay Tailwind
+├── styles-v2.css           ← TODO el CSS (~3100 líneas) — no hay Tailwind
 ├── magazine-styles.css     ← CSS específico del flipbook y páginas de revista
 │
 ├── placeholders.js         ← Sistema de fotos Unsplash por categoría
@@ -104,11 +110,13 @@ PrototipoClaudeDesign/
 │   │   ├── fotitos-estudio.png / -ink.png / -terra.png
 │   │   ├── rosa-umbria.png / -ink.png / -terra.png
 │   │   └── vida-grado.png / -ink.png / -terra.png
-│   └── team/               ← ⚠️ CARPETA VACÍA — el cliente debe colocar aquí:
-│       ├── equipo-formal.jpg      → Team de 5, pose formal en parque
-│       ├── equipo-divertidos.jpg  → Team de 5, poses divertidas en parque
-│       ├── rosa-evento.jpg        → Rosa con lentes, outfit negro, pulgares arriba
-│       └── trabajando.jpg         → Rosa + Emmanuel con gimbal, arrodillados
+│   └── team/               ← Fotos reales del cliente — YA TIENE CONTENIDO:
+│       ├── er-01.jpeg      → Silueta/atardecer Emmanuel & Rosa (79KB) — Hero principal
+│       ├── er-02.jpeg      → Playa caminando de frente (359KB) — Hero carousel
+│       ├── er-03.jpeg      → Caminando en la playa (459KB) — Historia card 1
+│       ├── er-04.jpeg      → Abrazo en la playa (482KB) — Historia card 2
+│       ├── rosa-evento.jpeg → Rosa en evento — Rosa Umbría section
+│       └── trabajando.jpeg  → Equipo trabajando — Audiovisual bg
 │
 └── AGENTS.md               ← Este archivo
 ```
@@ -128,6 +136,7 @@ PrototipoClaudeDesign/
 --cream-deep:     #EFE6D5   /* crema profundo */
 --champagne:      #C97846   /* COBRE OFICIAL — color del chevron del logo */
 --champagne-deep: #A86038   /* cobre oscuro */
+--copper:         #C97846   /* alias de --champagne — usar en badges/pills pkc */
 --terracotta:     #B8765A
 --muted:          #6b5e51
 
@@ -137,7 +146,8 @@ PrototipoClaudeDesign/
 ```
 
 ### Color crítico
-`--champagne: #C97846` es el cobre del logo. **No usar #D97B46** (incorrecto).
+`--champagne` y `--copper` son **exactamente el mismo valor `#C97846`**.
+**No usar `#D97B46`** (incorrecto).
 
 ### Convenciones tipográficas
 - Títulos: Bodoni Moda, uppercase, `font-weight: 900`
@@ -163,79 +173,90 @@ Cada seed produce la misma foto determinista. Usar seeds únicas por sección pa
 
 **Patrón CSS double-background** (local real + Unsplash fallback):
 ```jsx
-style={{ backgroundImage: `url(assets/team/rosa-evento.jpg), url(${window.umbriaImg("makeup", 91)})` }}
+style={{ backgroundImage: `url(assets/team/rosa-evento.jpeg), url(${window.umbriaImg("makeup", 91)})` }}
 ```
-El browser usa la primera URL que carga. Si la local no existe, usa Unsplash.
 
 ---
 
-## 6. Componentes implementados — estado actual
+## 6. Componentes implementados — estado actual (Mayo 2026)
 
 ### ✅ Completos y funcionando
 
 **Header** (`sections-1-v2.jsx` → `window.UmbriaHeader`)
 - Sticky con blur al scroll, logo dual (claro/oscuro), nav desktop + drawer mobile
 - Burger animado, lock scroll cuando abierto
+- Detecta secciones oscuras via `querySelectorAll('.weddings, .section--dark, .tsv3')` → cambia logo
 
 **Hero** (`sections-1-v2.jsx` → `window.UmbriaHero`)
-- Parallax bg a 0.4x, overlay + grain
-- FM animations: masthead, h1, sub, lede, CTAs con stagger
-- Prop `heroImage` desde tweaks panel
+- Foto principal: `assets/team/er-01.jpeg`
+- FM: masthead, h1, sub, lede, CTAs con stagger de entrada
+- **ER Photo Carousel** (derecha): frame flotante con 4 fotos ER cycling cada 3.6s
+  - CSS: `.hero__er-frame`, `.hero__er-photo-wrap`, `.hero__er-photo`, `.hero__er-label`, `.hero__er-footer`, `.hero__er-dots`, `.hero__er-dot`
+  - `hero__meta-right` oculto en ≥861px (el carousel ocupa ese espacio)
 
 **Universo** (`sections-1-v2.jsx` → `window.UmbriaUniverso`)
 - Grid 5 cards con logo dual (ink/light), foto hover, links a secciones
+- FM `whileInView` stagger + `whileHover { y: -7 }`
 
 **Historia** (`sections-1-v2.jsx` → `window.UmbriaHistoria`)
-- Foto equipo formal + foto flotante (divertidos) — stacked editorial effect
-- FM whileInView: imagen slide desde izquierda, contenido desde derecha
-- Fotos: `assets/team/equipo-formal.jpg` + `assets/team/equipo-divertidos.jpg` (con fallback Unsplash)
+- **Card stack carousel** con 2 fotos ER (`er-03.jpeg`, `er-04.jpeg`)
+- Auto-avance cada 4s, click en card o en dots para avanzar manualmente
+- Animación: front card entra desde la posición de la back card (rotada 5°, scale 0.90, offset x:24 y:-16) → se endereza y escala a 1:1. Exit: desliza hacia adelante-izquierda con contra-rotación
+- Back card siempre visible detrás con `rotate: 5, scale: 0.90`
+- CSS: `.story__card-stack`, `.story__card`, `.story__card--back`, `.story__card--front`, `.story__card-badge`, `.story__card-next`, `.story__card-dots`, `.story__dot`
+
+**Equipo** (`sections-1-v2.jsx` → `window.UmbriaEquipo`)
+- Slider de miembros del equipo con thumbnails
+- Fotos de `assets/team/` con fallbacks Unsplash
 
 **Bodas** (`sections-2.jsx` → `window.UmbriaBodas`)
-- Hero dark con foto de fondo + masonry de 8 imágenes
+- Hero dark con foto de fondo scale-in FM
+- Masonry 8 celdas: `whileInView` stagger + `whileHover scale(1.04)`
 
 **Paquetes** (`sections-2.jsx` → `window.UmbriaPaquetes`)
 - 5 tabs: Familiar, Marca Personal, Cumpleaños, Parejas, Maquillaje
-- Tab indicator animado con FM `layoutId="pack-tab-ind"`
-- Checkmarks SVG champagne en feature list
-- Cards con featured dark card
+- **Auto-cycling** cada 5.5s: `setInterval` en `useEffect2`, se resetea al click manual
+- **Dirección de slide**: `dir` state (1=forward, -1=backward) → FM `custom` prop
+- **Variants**: `enter (x:±56, opacity:0)` → `center (x:0, opacity:1)` → `exit (x:∓56, opacity:0)`
+- **Progress bar**: `motion2.span.pkc__tab-progress` → `scaleX: 0→1` en 5.5s linear, key reseteado por tab
+- Pill tab activa: `layoutId="pkc-pill"`, background `var(--copper)` (copper definido en `:root`)
+- Precios en `var(--champagne)` tanto en cards normales como featured
+- CSS clave: `.pkc__tabs`, `.pkc__tab`, `.pkc__pill`, `.pkc__tab-progress`, `.pkc__grid`, `.pkc__card`, `.pkc__card--featured`, `.pkc__amount`, `.pkc__cur`, `.pkc__badge`
+- hooks: `useState2`, `useEffect2`, `useRef2`
+
+**Proceso** (`sections-2.jsx` → `window.UmbriaProceso`)
+- 5 pasos con línea vertical, FM `whileInView` stagger
 
 **Rosa Umbría** (`sections-2.jsx` → `window.UmbriaRosaUmbria`)
-- Foto `assets/team/rosa-evento.jpg` + fallback
-- FM whileInView: scale + slide
-- Precios servicios inline
+- Foto `assets/team/rosa-evento.jpeg` + fallback
+- Servicios con FM `whileInView` slide + `whileHover { x: 4 }`
 
 **Vida Grado** (`sections-2.jsx` → `window.UmbriaVidaGrado`)
-- Layout dark con 2 paquetes de graduación
+- Layout dark con 2 paquetes, FM `whileInView` + `whileHover { y: -5 }`
 
 **Audiovisual** (`sections-2.jsx` → `window.UmbriaAudiovisual`)
 - 3 servicios en grid
-- Foto `assets/team/trabajando.jpg` como background atmosférico (opacity 0.12)
+- Foto `assets/team/trabajando.jpeg` como bg atmosférico (opacity 0.12, double-background pattern)
+- FM `whileInView` stagger + `whileHover { y: -4 }`
 
-**Proceso** (`sections-2.jsx` → `window.UmbriaProceso`)
-- 5 pasos con línea vertical
+**Testimonios v3** (`sections-3-v2.jsx` → `window.UmbriaTestimonios`)
+- Layout 3 columnas: `[counter + thumbnails] | [imagen principal] | [quote + nav]`
+- 4 testimonios con fotos Unsplash
+- Auto-play 6s, prev/next arrows
+- Blur-word animation: cada palabra del quote = `motion3.span` con `blur(8px)→0` stagger 24ms
+- CSS: `.tsv3`, `.tsv3__inner`, `.tsv3__left`, `.tsv3__main`, `.tsv3__right`, `.tsv3__thumb`, `.tsv3__arrow`
 
 **Biblioteca** (`sections-3-v2.jsx` → `window.UmbriaBiblioteca`)
-- Grid de 9 magazines, cada card abre el flipbook modal
-- Prop `onOpenMagazine(id)`
+- Grid 9 magazines, cada card abre flipbook modal
+- FM `whileInView` + `whileHover { y: -10, scale: 1.02 }`
 
 **Flipbook** (`flipbook.jsx` → `window.FlipBook`)
 - Doble modo: CSS keyframe (click/teclado) + drag rAF imperativo
-- Estado: `flipping` (CSS) XOR `drag` (rAF) — nunca simultáneos
-- Refs críticos: `flyingRef`, `bookRef`, `isDragging`, `dragProgress`, `dragDir`
-- Flying page: fwd origin `left center`, back origin `right center`
 - Snap-back si drag < 15%, completar si ≥ 15%
-
-**Testimonios v2** (`sections-3-v2.jsx` → `window.UmbriaTestimonios`)
-- 3D fan: 3 fotos simultáneas, left/right con `rotateY(±13deg) scale(0.83)`
-- Blur-in por palabra: cada `<motion3.span>` con `blur(8px)→0` stagger 22ms
-- AnimatePresence en el bloque de quote
-- First slot: `assets/team/equipo-formal.jpg` (Emmanuel & Rosa)
-- Nav: flechas circulares ink/champagne, counter `N / total`
 
 **Instagram** (`sections-3-v2.jsx` → `window.UmbriaInstagram`)
 - 3 columnas: @emmanuelumbriafotografia, @fotitosestudio_, @rosaumbria_
-- Cada columna: avatar, grid 3×2, botón follow
-- FM stagger whileInView por columna (delay 0.13s × idx)
+- FM `whileInView` stagger por columna + `whileHover { scale: 1.06 }` por foto
 
 **Contacto** (`sections-3-v2.jsx` → `window.UmbriaContacto`)
 - Formulario + aside con datos de contacto
@@ -244,43 +265,160 @@ El browser usa la primera URL que carga. Si la local no existe, usa Unsplash.
 - Logo, nav, redes, tagline
 
 **Chatbot + WhatsApp** (`floats.jsx` → `window.UmbriaFloats`)
-- Chatbot llama `window.claude.complete(prompt)` — mock con 7 keywords en español
-- Logo Umbría como avatar + botón chevron
-- WhatsApp link directo a +56958335416
-
-**Page Loader**
-- Inline CSS + div `#umbria-loader`
-- Logo PNG con fallback SVG chevron animado (stroke-dashoffset)
-- Desaparece al `fm-ready` + 180ms (loader espera a que FM cargue)
+- Chatbot con `AnimatePresence` slide-up (motionF.div)
+- Burbujas de chat: `motionF.div` con enter animation
+- Float buttons: `motionF.button/a` con `whileHover/whileTap spring`
+- Llama `window.claude.complete(prompt)` — mock actual en `index v2.html`
+- WhatsApp → `https://wa.me/56958335416`
 
 ---
 
-## 7. Pendiente / próximos pasos
+## 7. Hook aliases por archivo
+
+```js
+// sections-1-v2.jsx
+const { useState: useState1, useEffect: useEffect1, useRef: useRef1 } = React;
+const motion = window.motion;
+
+// sections-2.jsx
+const { useState: useState2, useEffect: useEffect2, useRef: useRef2 } = React;
+const motion2 = window.motion;
+
+// sections-3-v2.jsx
+const { useState: useState3, useEffect: useEffect3, useRef: useRef3 } = React;
+const motion3 = window.motion;
+
+// floats.jsx
+const { useState: useStateF, useRef: useRefF, useEffect: useEffectF } = React;
+const motionF = window.motion;
+```
+
+**Nunca usar `useState` sin alias** — colisiona entre archivos en scope global de Babel.
+
+---
+
+## 8. CSS — namespaces por sección
+
+| Prefijo | Sección |
+|---------|---------|
+| `.hero__*` | Hero + ER carousel |
+| `.story__*` | Historia card stack |
+| `.eqslider__*` | Equipo slider |
+| `.pkc__*` | Paquetes pricing |
+| `.tsv3__*` | Testimonios v3 |
+| `.weddings__*`, `.masonry__*` | Bodas |
+| `.step__*` | Proceso |
+| `.rosa-*` | Rosa Umbría |
+| `.grado-*` | Vida Grado |
+| `.av-*` | Audiovisual |
+| `.library__*` | Biblioteca |
+| `.ig-*` | Instagram |
+| `.chatbot__*`, `.float-btn` | Floats |
+
+Todo el CSS está en `styles-v2.css`. Para nuevos estilos: agregar al final del archivo.
+**No hay Tailwind. No hay CSS modules.**
+
+---
+
+## 9. Pendiente / próximos pasos
 
 ### Inmediato (cliente)
-- [ ] Colocar 4 fotos en `assets/team/` con los nombres exactos (ver sección 3)
+- [ ] Reemplazar fotos Unsplash con fotos reales del portafolio en Bodas, Testimonios, Universo
 - [ ] Confirmar precios en `magazines-data.js` y `sections-2.jsx`
-- [ ] Reemplazar fotos Unsplash con fotos reales del portafolio
+- [ ] Fotos equipo completo (si quiere mostrar al equipo en la sección Equipo)
 
 ### Desarrollo (siguiente fase)
 - [ ] Conectar chatbot a API real de Claude (`window.claude.complete` → fetch real)
 - [ ] Formulario de contacto → backend (emailjs o endpoint propio)
 - [ ] Botón "Descargar PDF" en flipbook → generar PDF real
-- [ ] Despliegue: el sitio es estático puro — puede ir directo a Vercel/Netlify/GitHub Pages
+- [ ] Despliegue: el sitio es estático puro → Vercel / Netlify / GitHub Pages
 - [ ] SEO: meta tags OG, sitemap, schema.org (LocalBusiness + Photographer)
 
 ### Mejoras opcionales
 - [ ] Dark mode toggle
-- [ ] Más testimonios reales (actualmente 3)
 - [ ] Video hero (reemplazar foto por video corto de bodas)
-- [ ] Galería de fotos reales en sección Bodas (masonry actual usa Unsplash)
+- [ ] Galería de fotos reales en masonry de Bodas
+- [ ] Más testimonios reales (actualmente 4 Unsplash)
+- [ ] Animación de contador en sección Equipo o Estadísticas
 
 ---
 
-## 8. Git workflow
+## 10. Datos de contenido clave
+
+### Precios actuales (en `sections-2.jsx` → `PACKS`)
+```
+Familiar:     Esencia $70k | Armonía $120k (featured) | Legado $200k
+Marca:        Básico $80k  | Profesional $150k | Premium $250k (featured)
+Cumpleaños:   Dulce $80k   | Fiesta $150k (featured) | Celebración $200k
+Parejas:      Amor $60k    | Romance $100k (featured)
+Maquillaje:   Sesión $60k  | Novia Esencial $180k | Novia Atelier $280k (featured)
+Bodas:        Esencial $1.290.000
+Graduaciones: Esencial $350k | Completa $650k (featured)
+```
+
+### `magazines-data.js` — 9 revistas
+IDs: `bodas`, `familiar`, `embarazo`, `smash`, `marca`, `cumple`, `parejas`, `rosa`, `grado`
+Cada una tiene ~8-12 páginas con layouts variados (portada, precios, galería, etc.)
+
+---
+
+## 11. Patrones críticos — NO romper
+
+### 1. Nombre del archivo con espacio
+`index v2.html` — NO renombrar.
+
+### 2. `window.*` exports — nunca imports entre JSX
+```jsx
+// ✅ Correcto (al final de cada archivo)
+window.UmbriaX = X;
+
+// ❌ Rompe todo
+export default X;
+import X from './X';
+```
+
+### 3. FM motion via `window.motion` — no import directo
+```jsx
+// ✅
+const motion = window.motion;
+<motion.div animate={{ opacity: 1 }}>
+
+// ❌ Rompe todo
+import { motion } from 'framer-motion';
+```
+
+### 4. AnimatePresence — acceder dentro del componente
+```jsx
+// ✅
+function MiComponente() {
+  const AnimPres = window.AnimatePresence;
+  return <AnimPres>...</AnimPres>;
+}
+
+// ❌ (puede capturar antes de que FM cargue)
+const AnimPres = window.AnimatePresence;
+```
+
+### 5. Double-background pattern para fotos con fallback
+```jsx
+style={{ backgroundImage: `url(assets/team/foto.jpeg), url(${window.umbriaImg("category", seed)})` }}
+```
+
+### 6. `SectionBoundary` en app-v2.jsx
+Cada sección está envuelta en un error boundary. Si una sección desaparece en blanco, revisar consola — habrá un error de JS aislado al boundary.
+
+### 7. Overflow visible para FM hover lift
+Los contenedores de grids necesitan `overflow: visible` para que el `translateY` en hover no se corte:
+```css
+.pkc__grid, .universe-grid, .library__grid, .masonry, .grado-packs { overflow: visible; }
+```
+
+---
+
+## 12. Git workflow
 
 ```
-main     ← producción estable
+main     ← producción estable (mostrar al cliente)
 develop  ← desarrollo activo (aquí trabajar)
 ```
 
@@ -290,18 +428,18 @@ Siempre trabajar en `develop`. Merge a `main` solo cuando esté listo para mostr
 
 ---
 
-## 9. Cómo correr localmente
+## 13. Cómo correr localmente
 
-Requiere servidor HTTP (no funciona como `file://` por CORS en las imágenes).
+Requiere servidor HTTP (no funciona como `file://` por CORS).
 
 ```bash
-# Opción 1: wamp64 (ya configurado)
-# Abrir: http://localhost/umbria/PrototipoClaudeDesign/index%20v2.html
+# Opción 1: wamp64 (ya configurado en la máquina del cliente)
+# http://localhost/umbria/PrototipoClaudeDesign/index%20v2.html
 
 # Opción 2: Python
 cd PrototipoClaudeDesign
 python -m http.server 8080
-# Abrir: http://localhost:8080/index%20v2.html
+# http://localhost:8080/index%20v2.html
 
 # Opción 3: VS Code Live Server
 # Click derecho en "index v2.html" → Open with Live Server
@@ -309,74 +447,9 @@ python -m http.server 8080
 
 ---
 
-## 10. Patrones críticos — NO romper
+## 14. Conexión Automatizatech
 
-### 1. El nombre del archivo tiene espacio
-`index v2.html` — así está en producción. No renombrar.
-
-### 2. `window.*` exports — nunca imports entre JSX
-Cada archivo es un script independiente. No usar `import`/`export`.
-
-### 3. FM motion via `window.motion` — no import directo
-```jsx
-// ✅ Correcto
-const motion = window.motion;
-<motion.div animate={{ opacity: 1 }}>
-
-// ❌ Rompe todo
-import { motion } from 'framer-motion';
-```
-
-### 4. React hooks destructurados por archivo con alias
-Cada JSX usa su propio alias para evitar colisiones:
-```js
-// sections-1-v2.jsx
-const { useState: useState1, useEffect: useEffect1, useRef: useRef1 } = React;
-// sections-2.jsx  
-const { useState: useState2, useEffect: useEffect2 } = React;
-// sections-3-v2.jsx
-const { useState: useState3, useEffect: useEffect3, useRef: useRef3 } = React;
-// app-v2.jsx, flipbook.jsx, floats.jsx usan React directo sin alias
-```
-
-### 5. CSS — no hay Tailwind, no hay CSS modules
-Todo el CSS está en `styles-v2.css`. BEM-style con modificadores `is-*`.
-Para nuevos estilos: agregar al final de `styles-v2.css`.
-
-### 6. Imágenes de fondo — patrón double-background
-```jsx
-// Foto real + fallback Unsplash
-style={{ backgroundImage: `url(assets/team/foto.jpg), url(${window.umbriaImg("category", seed)})` }}
-```
-
----
-
-## 11. Datos de contenido clave
-
-### Precios actuales (en sections-2.jsx → PACKS)
-```
-Familiar:  Esencia $70k | Armonía $120k (featured) | Legado $200k
-Marca:     Básico $80k | Profesional $150k | Premium $250k (featured)
-Cumpleaños: Dulce $80k | Fiesta $150k (featured) | Celebración $200k
-Parejas:   Amor $60k | Romance $100k (featured)
-Maquillaje: Sesión $60k | Novia Esencial $180k | Novia Atelier $280k (featured)
-Bodas:     Esencial $1.290.000
-Graduaciones: Esencial $350k | Completa $650k (featured)
-```
-
-### magazines-data.js — 9 revistas
-IDs: `bodas`, `familiar`, `embarazo`, `smash`, `marca`, `cumple`, `parejas`, `rosa`, `grado`
-Cada una tiene ~8-12 páginas con layouts variados (portada, precios, galería, etc.)
-
----
-
----
-
-## 12. Conexión Automatizatech
-
-Este proyecto es un **entregable del pipeline de Automatizatech** — la agencia de automatización IA que generó y gestiona este cliente.
-
-### Posición en el pipeline AT
+Este proyecto es un **entregable del pipeline de Automatizatech**.
 
 ```
 Paso 1 ✅  Demo con Emmanuel & Rosa
@@ -387,31 +460,22 @@ Paso 5 ⏳  Ejecución → invocar skill at-dev-kickoff
 Paso 6 ⏳  Conversión a cliente definitivo
 ```
 
-### Cuando el cliente apruebe
-
-Invocar skill `at-dev-kickoff` en el entorno de Claude Code:
-```
-/at-dev-kickoff
-```
-Esto inicia la definición técnica del scope real de desarrollo.
+Cuando el cliente apruebe → invocar `/at-dev-kickoff` en Claude Code.
 
 ### Memoria y contexto compartido
 
 - **Claude memory:** `C:\Users\luis_\.claude\projects\C--Users-luis-\memory\project_umbria_studio.md`
 - **Obsidian vault:** `C:\Users\luis_\Documents\Codex\AI-Memory-Vault\10-Projects\Umbria-Studio.md`
-- **Project Index:** `C:\Users\luis_\Documents\Codex\AI-Memory-Vault\10-Projects\Project-Index.md`
 
 ### Agentes en paralelo
 
 | Agente | Cómo trabaja |
 |--------|-------------|
-| **Claude** | Diseño, arquitectura, sesiones largas |
-| **Codex** | Features nuevos, lee este AGENTS.md, hace PRs a `develop` |
+| **Claude** | Diseño, arquitectura, sesiones largas de refinamiento |
+| **Codex** | Features nuevos, lee este AGENTS.md, hace commits a `develop` |
 | **GitHub Copilot** | Completions inline, code review |
-
-> Todos hacen PRs o commits a `develop`. Merge a `main` solo cuando estable.
 
 ---
 
-*Generado automáticamente al cierre de la sesión de diseño — Mayo 2026*
+*Última actualización: Mayo 26, 2026 — Sesión de refinamiento v2*
 *Claude Sonnet 4.6 + Luis Gómez · Automatizatech*
