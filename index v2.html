@@ -132,7 +132,7 @@
 
     window.motion = new Proxy({}, {
       get: function(_, tag) {
-        if (_real) return _real[tag];
+        if (_real && _real[tag]) return _real[tag];   // FM real, pero cae a fallback si el tag no existe
         if (!_cache[tag]) {
           (function(t) {
             _cache[t] = function MotionFallback(props) {
@@ -151,8 +151,8 @@
     window.useInView = function() { return true; };
 
     window.__fmSetReal = function(fm) {
-      _real = fm.motion;
-      if (fm.AnimatePresence) window.AnimatePresence = fm.AnimatePresence;
+      if (fm && fm.motion) _real = fm.motion;   // si motion no viene, conserva los fallbacks
+      if (fm && fm.AnimatePresence) window.AnimatePresence = fm.AnimatePresence;
       if (fm.useInView) window.useInView = fm.useInView;
       window.dispatchEvent(new CustomEvent('fm-ready'));
     };

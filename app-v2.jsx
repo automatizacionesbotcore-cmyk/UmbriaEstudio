@@ -150,9 +150,17 @@ function App() {
 
       <SectionBoundary><window.UmbriaFooter /></SectionBoundary>
 
-      {magazine && <window.FlipBook magazine={magazine} onClose={() => setOpenMag(null)} />}
+      {magazine && (
+        <SectionBoundary>
+          <window.FlipBook magazine={magazine} onClose={() => setOpenMag(null)} />
+        </SectionBoundary>
+      )}
 
-      <window.UmbriaFloats chatOpen={chatOpen} onToggleChat={() => setChatOpen(v => !v)} />
+      {/* Floats usa motion/AnimatePresence — boundary evita que un fallo de FM/CDN
+          deje en blanco toda la página (antes quedaba fuera de boundary). */}
+      <SectionBoundary>
+        <window.UmbriaFloats chatOpen={chatOpen} onToggleChat={() => setChatOpen(v => !v)} />
+      </SectionBoundary>
 
       {/* Tweaks Panel */}
       <window.TweaksPanel title="Tweaks">
