@@ -19,11 +19,13 @@
   --paper: var(--cream);
   --text: var(--ink);
   --muted: #6b5e51;
+  --ink-muted: #6b5e51;        /* alias de --muted, usado en notas pkc/footer */
   --line: rgba(10,10,10,0.12);
   --line-strong: rgba(10,10,10,0.5);
 
   /* Type */
   --magazine: "Bodoni Moda", "Didot", "Playfair Display", Georgia, serif;
+  --display: "Bodoni Moda", "Didot", "Playfair Display", Georgia, serif; /* alias de --magazine — usado en tarjetas pkc */
   --script: "Allura", "Pinyon Script", "Great Vibes", cursive;
   --sans: "Inter", "DM Sans", -apple-system, system-ui, sans-serif;
 
@@ -469,6 +471,7 @@ section { position: relative; }
   color: var(--ink);
   opacity: 0.65;
   text-transform: uppercase;
+  font-variant-numeric: tabular-nums;  /* contador 01/04 sin salto */
 }
 .hero__er-dots {
   display: flex;
@@ -3351,6 +3354,7 @@ section { position: relative; }
   font-weight: 700;
   line-height: 1;
   color: var(--champagne);
+  font-variant-numeric: tabular-nums;  /* dígitos de ancho fijo — sin jitter al cambiar de tab */
   animation: pkcAmountIn 0.4s cubic-bezier(.34,1.56,.64,1);
 }
 .pkc__card--featured .pkc__amount { color: var(--champagne); }
