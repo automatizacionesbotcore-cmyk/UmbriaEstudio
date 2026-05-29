@@ -132,6 +132,7 @@ function App() {
 
       <main>
         <SectionBoundary><window.UmbriaHero heroImage={heroImage} /></SectionBoundary>
+        <SectionBoundary><window.UmbriaProofStrip /></SectionBoundary>
         <SectionBoundary><window.UmbriaUniverso /></SectionBoundary>
         <SectionBoundary><window.UmbriaHistoria /></SectionBoundary>
         <SectionBoundary><window.UmbriaEquipo /></SectionBoundary>

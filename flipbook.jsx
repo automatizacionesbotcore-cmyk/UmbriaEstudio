@@ -11,6 +11,7 @@ function FlipBook({ magazine, onClose }) {
   const [spread, setSpread] = useState(0);
   const [flipping, setFlipping] = useState(null); // null | "fwd" | "back"  — CSS flip
   const [drag, setDrag]    = useState(null);       // null | { dir, fFront, fBack } — drag flip
+  const [bookMode, setBookMode] = useState(true);
 
   const FLIP_MS = 820;
 
@@ -60,7 +61,7 @@ function FlipBook({ magazine, onClose }) {
       flyingRef.current.style.transform = `rotateY(${angle}deg)`;
       // Dynamic shadow on the curl
       const shds = flyingRef.current.querySelectorAll(".flipbook__page-curl-shadow");
-      const intensity = Math.abs(Math.sin(angle * Math.PI / 180)) * 0.45;
+      const intensity = Math.abs(Math.sin(angle * Math.PI / 180)) * 0.68;
       shds.forEach(s => { s.style.opacity = intensity; });
     }
 
@@ -130,7 +131,7 @@ function FlipBook({ magazine, onClose }) {
     const onPointerUp = () => {
       if (!isDragging.current) return;
       isDragging.current = false;
-      if (dragProgress.current > 0.15) { completeDrag(); }
+      if (dragProgress.current > 0.12) { completeDrag(); }
       else { snapBack(); }
     };
 
@@ -158,6 +159,16 @@ function FlipBook({ magazine, onClose }) {
     const fFront = dir === "fwd" ? spread + 1 : spread;
     const fBack  = dir === "fwd" ? spread + 2 : spread - 1;
     setDrag({ dir, fFront, fBack });
+  };
+
+  const pickResponsiveDir = (e, fallback) => {
+    if (!bookMode && window.matchMedia && window.matchMedia("(max-width: 768px)").matches && bookRef.current) {
+      if (spread <= 0) return "fwd";
+      if (spread + 2 >= totalPages) return "back";
+      const r = bookRef.current.getBoundingClientRect();
+      return e.clientX < r.left + r.width / 2 ? "back" : "fwd";
+    }
+    return fallback;
   };
 
   // ── Static page helper ───────────────────────────────────────────────────
@@ -221,13 +232,13 @@ function FlipBook({ magazine, onClose }) {
       </div>
 
       <div className="flipbook-stage">
-        <div className={`flipbook ${isActive ? "is-flipping" : ""}`} ref={bookRef}>
+        <div className={`flipbook ${isActive ? "is-flipping" : ""} ${bookMode ? "is-book-mode" : ""}`} ref={bookRef}>
 
           {/* ── Left half ── */}
           <div
             className="flipbook__half flipbook__half--left"
             style={{ cursor: canGoBack ? "grab" : "default", touchAction: "none" }}
-            onPointerDown={(e) => startDrag(e, "back")}
+            onPointerDown={(e) => startDrag(e, pickResponsiveDir(e, "back"))}
           >
             {drag
               ? (showDragLeft  && renderStaticPage(leftIdx, "left"))
@@ -274,7 +285,7 @@ function FlipBook({ magazine, onClose }) {
           {drag && (
             <div
               ref={flyingRef}
-              className="flipbook__flying"
+              className={`flipbook__flying flipbook__flying--drag flipbook__flying--drag-${drag.dir}`}
               style={{
                 transform: "rotateY(0deg)",
                 transformOrigin: drag.dir === "fwd" ? "left center" : "right center",
@@ -325,8 +336,11 @@ function FlipBook({ magazine, onClose }) {
           <span className="cur">{Math.min(rightIdx + 1, totalPages)}</span>
           <span style={{ opacity: 0.5 }}> / {totalPages}</span>
         </div>
-        <button className="btn-icon" onClick={next} disabled={spread + 2 >= totalPages || !!isActive} aria-label="Página siguiente">
+          <button className="btn-icon" onClick={next} disabled={spread + 2 >= totalPages || !!isActive} aria-label="Página siguiente">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M7 3 L13 9 L7 15"/></svg>
+        </button>
+        <button className="flipbook-view-toggle" onClick={() => setBookMode(v => !v)}>
+          {bookMode ? "Una página" : "Ver como libro"}
         </button>
         <div className="actions">
           <button>Descargar PDF</button>

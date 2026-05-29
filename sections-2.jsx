@@ -121,6 +121,39 @@ const PACKS = {
   ],
 };
 
+const TAB_VISUALS = {
+  familiar: {
+    src: "assets/pdf-frames/estudio/familia-01.jpg",
+    kicker: "Fotito Estudio",
+    title: "Familia con calma",
+    text: "Sesiones guiadas, naturales y pensadas para guardar lo cotidiano con intención.",
+  },
+  marca: {
+    src: "assets/team/equipo-formal.jpeg",
+    kicker: "Marca Personal",
+    title: "Retratos con dirección",
+    text: "Imágenes limpias para mostrar quién eres, qué haces y cómo quieres ser recordado.",
+  },
+  cumple: {
+    src: "assets/pdf-frames/estudio/familia-04.jpg",
+    kicker: "Cumpleaños",
+    title: "Celebrar tu etapa",
+    text: "Un registro luminoso para cumpleaños, generaciones y momentos que merecen escena.",
+  },
+  parejas: {
+    src: "assets/team/er-beso-olas.jpeg",
+    kicker: "Parejas",
+    title: "Historias de dos",
+    text: "Dirección suave, movimiento real y fotografía editorial para una conexión honesta.",
+  },
+  makeup: {
+    src: "assets/team/rosa-evento.jpeg",
+    kicker: "Rosa Umbría",
+    title: "Makeup & hair",
+    text: "Preparación, detalle y belleza aplicada para sesiones, novias y eventos especiales.",
+  },
+};
+
 // Icon helpers for pack features
 function IconCheck({ featured }) {
   return (
@@ -142,6 +175,7 @@ function Paquetes() {
 
   const tab = TABS[tabIdx].id;
   const packs = PACKS[tab];
+  const visual = TAB_VISUALS[tab];
 
   function startTimer() {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -173,15 +207,32 @@ function Paquetes() {
     <section className="section section--cream" id="estudio">
       <div className="container">
 
-        <div className="section-head reveal" style={{ textAlign: "center" }}>
-          <div className="eyebrow">Sesiones · Precios 2026</div>
-          <h2>
-            SESIONES QUE<br/>
-            <em>se ajustan a ti</em>
-          </h2>
-          <p style={{ maxWidth: 440, margin: "12px auto 0", fontSize: 15, color: "var(--ink-soft)" }}>
-            Elige la categoría y encuentra el paquete ideal para tu momento.
-          </p>
+        <div className="pkc__intro reveal">
+          <div className="section-head pkc__intro-copy">
+            <div className="eyebrow">Sesiones · Precios 2026</div>
+            <h2>
+              SESIONES QUE<br/>
+              <em>se ajustan a ti</em>
+            </h2>
+            <p>
+              Elige la categoría y encuentra el paquete ideal para tu momento.
+            </p>
+          </div>
+
+          <motion2.figure
+            className="pkc__visual"
+            key={tab}
+            initial={{ opacity: 0, x: 42, scale: 0.96 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <img src={visual.src} alt={`${visual.title} - ${visual.kicker}`} />
+            <figcaption>
+              <span>{visual.kicker}</span>
+              <strong>{visual.title}</strong>
+              <em>{visual.text}</em>
+            </figcaption>
+          </motion2.figure>
         </div>
 
         {/* ── Category pill tabs ── */}
@@ -466,38 +517,79 @@ function VidaGrado() {
 
 // ============== AUDIOVISUAL ==============
 const AV_SERVICES = [
-  { icon: "🎙", title: "Grabación de podcasts",
-    desc: "Estudio con equipos de audio y video profesionales. Tu contenido, con producción de nivel." },
-  { icon: "🎬", title: "Producción de eventos",
-    desc: "Cobertura fotográfica y videográfica para eventos corporativos, lanzamientos y conferencias." },
-  { icon: "📱", title: "Contenido para redes",
-    desc: "Producción de Reels, TikToks y contenido audiovisual para Instagram y YouTube." },
+  {
+    no: "01",
+    icon: "🎙",
+    label: "Podcast / entrevista",
+    title: "Grabación de podcasts",
+    desc: "Estudio con equipos de audio y video profesionales. Tu contenido, con producción de nivel.",
+    shot: "Plano medio · detalle de manos · corte vertical",
+  },
+  {
+    no: "02",
+    icon: "🎬",
+    label: "Evento / lanzamiento",
+    title: "Producción de eventos",
+    desc: "Cobertura fotográfica y videográfica para eventos corporativos, lanzamientos y conferencias.",
+    shot: "Apertura ambiente · reacción público · highlight final",
+  },
+  {
+    no: "03",
+    icon: "📱",
+    label: "Social / campaña",
+    title: "Contenido para redes",
+    desc: "Producción de Reels, TikToks y contenido audiovisual para Instagram y YouTube.",
+    shot: "Hook inicial · producto en acción · cierre con marca",
+  },
 ];
 
 function Audiovisual() {
+  const [activeAv, setActiveAv] = useState2(0);
+
+  useEffect2(() => {
+    const t = setInterval(() => {
+      setActiveAv(v => (v + 1) % AV_SERVICES.length);
+    }, 4200);
+    return () => clearInterval(t);
+  }, []);
+
+  const active = AV_SERVICES[activeAv];
+
   return (
     <section className="section section--cream-deep" id="audiovisual">
-      {/* Real team photo — atmospheric, low opacity, positioned right */}
+      {/* Real team photo — keep right-side bleed as requested */}
       <div
         className="av-team-photo"
         style={{ backgroundImage: `url(assets/team/trabajando.jpeg), url(${window.umbriaImg("audiovisual", 111)})` }}
       />
       <div className="container">
-        <div className="av-layout reveal">
-
+        <motion2.div
+          className="av-layout reveal"
+          initial={{ opacity: 0, y: 34 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.18 }}
+          transition={{ duration: 0.78, ease: [0.16, 1, 0.3, 1] }}
+        >
           <div className="av-head">
             <div className="eyebrow" style={{ color: "var(--champagne-deep)" }}>Línea audiovisual</div>
             <h2>
               AUDIO<br/>
               <em>visual</em>
             </h2>
+            <div className="av-head__cue">
+              <span>{active.no}</span>
+              <p>{active.label}</p>
+            </div>
           </div>
 
-          <div className="av-services">
+          <div className="av-services" aria-label="Categorías audiovisuales">
+            <div className="av-services__scanline" />
             {AV_SERVICES.map((s, i) => (
-              <motion2.div
-                className="av-item"
-                key={i}
+              <motion2.button
+                type="button"
+                className={`av-item ${activeAv === i ? "is-active" : ""}`}
+                key={s.no}
+                onClick={() => setActiveAv(i)}
                 initial={{ opacity: 0, y: 28 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.15 }}
@@ -505,17 +597,35 @@ function Audiovisual() {
                 whileHover={{ y: -4, transition: { duration: 0.22 } }}
               >
                 <div className="av-item__icon">{s.icon}</div>
+                <div className="av-item__label">{s.label}</div>
                 <h4 className="av-item__title">{s.title}</h4>
                 <p className="av-item__desc">{s.desc}</p>
-              </motion2.div>
+                <div className="av-item__shot">{s.shot}</div>
+                {activeAv === i && (
+                  <motion2.span
+                    className="av-item__progress"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 4.2, ease: "linear" }}
+                  />
+                )}
+              </motion2.button>
             ))}
           </div>
 
-          <div style={{ alignSelf: "end" }}>
+          <div className="av-cta-wrap">
+            <div className="av-cinema-preview">
+              <div className="av-cinema-preview__rec">REC</div>
+              <div className="av-cinema-preview__frame">
+                <span>{active.no}</span>
+                <strong>{active.title}</strong>
+                <em>{active.shot}</em>
+              </div>
+            </div>
+            <div className="av-cta-wrap__tag">Producción con mirada editorial</div>
             <a href="#contacto" className="btn">Cotizar producción</a>
           </div>
-
-        </div>
+        </motion2.div>
       </div>
     </section>
   );

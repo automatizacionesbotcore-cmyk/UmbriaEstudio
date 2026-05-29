@@ -476,11 +476,11 @@ function Footer() {
         <div className="footer__col">
           <h4>Universo</h4>
           <ul>
-            <li><a href="#bodas">Emmanuel Umbría — Bodas</a></li>
-            <li><a href="#estudio">Fotito Estudio</a></li>
-            <li><a href="#maquillaje">Rosa Umbría — Makeup</a></li>
-            <li><a href="#graduaciones">Vida Grado</a></li>
-            <li><a href="#audiovisual">Audiovisual</a></li>
+            <li><a href="servicios/bodas/index.html">Emmanuel Umbría — Bodas</a></li>
+            <li><a href="servicios/estudio/index.html">Fotito Estudio</a></li>
+            <li><a href="servicios/maquillaje/index.html">Rosa Umbría — Makeup</a></li>
+            <li><a href="servicios/graduaciones/index.html">Vida Grado</a></li>
+            <li><a href="servicios/audiovisual/index.html">Audiovisual</a></li>
           </ul>
         </div>
 

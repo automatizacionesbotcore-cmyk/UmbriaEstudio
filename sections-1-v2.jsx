@@ -118,7 +118,17 @@ function Hero({ heroImage }) {
   return (
     <section className="hero" id="top">
       <div className="hero__bg" ref={ref}>
-        <div className="hero__bg-image" style={{ backgroundImage: heroImage }} />
+        <AnimPresHero initial={false}>
+          <motion.div
+            key={`hero-bg-${erIdx}`}
+            className="hero__bg-image"
+            style={{ backgroundImage: `url(${ER_PHOTOS[erIdx].src}), ${heroImage}` }}
+            initial={{ opacity: 0, scale: 1.04 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.02 }}
+            transition={{ duration: 1.15, ease: [0.4, 0, 0.2, 1] }}
+          />
+        </AnimPresHero>
         <div className="hero__bg-overlay" />
         <div className="hero__grain" />
       </div>
@@ -143,7 +153,8 @@ function Hero({ heroImage }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.05, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
         >
-          TU HISTORIA<br/>
+          <span className="hero__headline-desktop">TU HISTORIA</span>
+          <span className="hero__headline-mobile">TU<br/>HISTORIA</span><br/>
           <em>en portada</em>
         </motion.h1>
 
@@ -234,6 +245,72 @@ function Hero({ heroImage }) {
   );
 }
 
+// ============== PROOF STRIP ==============
+const PROOF_ITEMS = [
+  {
+    k: "01",
+    title: "Reunión personal",
+    text: "Cada boda y sesión importante parte con una conversación real con Emmanuel o Rosa.",
+  },
+  {
+    k: "02",
+    title: "Dirección cercana",
+    text: "Guía de poses, vestuario y ritmo para que la experiencia se sienta natural.",
+  },
+  {
+    k: "03",
+    title: "Entrega editorial",
+    text: "Galerías privadas, selección cuidada y piezas pensadas para conservar.",
+  },
+  {
+    k: "04",
+    title: "Cinco líneas",
+    text: "Bodas, estudio, maquillaje, graduaciones y audiovisual bajo una sola mirada.",
+  },
+];
+
+function ProofStrip() {
+  return (
+    <section className="proof-strip" aria-label="Experiencia Umbría">
+      <div className="container">
+        <div className="proof-strip__grid">
+          <motion.div
+            className="proof-strip__lead"
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.35 }}
+            transition={{ duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="eyebrow">La diferencia Umbría</div>
+            <h2>
+              MÁS QUE FOTOS,<br/>
+              <em>una experiencia guiada</em>
+            </h2>
+          </motion.div>
+
+          <div className="proof-strip__items">
+            {PROOF_ITEMS.map((item, i) => (
+              <motion.article
+                className="proof-strip__item"
+                key={item.k}
+                initial={{ opacity: 0, y: 26 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.25 }}
+                transition={{ duration: 0.58, ease: [0.25, 0.46, 0.45, 0.94], delay: i * 0.08 }}
+                whileHover={{ y: -6, transition: { duration: 0.22 } }}
+              >
+                <span className="proof-strip__num">{item.k}</span>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ============== UNIVERSO ==============
 const UNIVERSE = [
   {
@@ -242,7 +319,7 @@ const UNIVERSE = [
     logoLight: "assets/logos/emmanuel-umbria.png",
     tag: "Tu boda contada con sensibilidad",
     desc: "Atención personal de Emmanuel — ninguna boda se gestiona por formulario.",
-    href: "#bodas",
+    href: "servicios/bodas/index.html",
     img: () => window.umbriaImg("weddingBW", 11),
   },
   {
@@ -251,7 +328,7 @@ const UNIVERSE = [
     logoLight: "assets/logos/fotitos-estudio.png",
     tag: "Familia, embarazo, recién nacidos",
     desc: "Estudio fotográfico para los momentos que te importan, en Buin.",
-    href: "#estudio",
+    href: "servicios/estudio/index.html",
     img: () => window.umbriaImg("family", 12),
   },
   {
@@ -260,7 +337,7 @@ const UNIVERSE = [
     logoLight: "assets/logos/rosa-umbria.png",
     tag: "Makeup & Hair para novias",
     desc: "Maquillaje y peinado para novias, sesiones y eventos.",
-    href: "#maquillaje",
+    href: "servicios/maquillaje/index.html",
     img: () => window.umbriaImg("makeup", 13),
   },
   {
@@ -269,7 +346,7 @@ const UNIVERSE = [
     logoLight: "assets/logos/vida-grado.png",
     tag: "El logro que dura para siempre",
     desc: "Cobertura para colegios, institutos y universidades.",
-    href: "#graduaciones",
+    href: "servicios/graduaciones/index.html",
     img: () => window.umbriaImg("graduation", 14),
   },
   {
@@ -278,7 +355,7 @@ const UNIVERSE = [
     logoLight: null,
     tag: "Podcasts, eventos y producción",
     desc: "Línea audiovisual para marcas, eventos y creadores.",
-    href: "#audiovisual",
+    href: "servicios/audiovisual/index.html",
     img: () => window.umbriaImg("audiovisual", 15),
   },
 ];
@@ -605,6 +682,7 @@ function Equipo() {
 
 window.UmbriaHeader = Header;
 window.UmbriaHero = Hero;
+window.UmbriaProofStrip = ProofStrip;
 window.UmbriaUniverso = Universo;
 window.UmbriaHistoria = Historia;
 window.UmbriaEquipo = Equipo;
