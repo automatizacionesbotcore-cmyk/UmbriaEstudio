@@ -52,6 +52,39 @@
 
 ---
 
+## 3.b Auditoría de responsividad (medición DOM en navegador real)
+
+Método: servidor estático local + Chromium headless (Claude Preview), medición de
+layout con `getBoundingClientRect` a 375px (mobile), 768px (tablet) y verificación
+de scroll horizontal — el bug #1 en móvil. Cubre `index v2.html` + páginas de servicio
+(comparten `service-styles.css` + `service-page.js`, una es representativa de las 5).
+
+| Check | 375px | 768px | Resultado |
+|-------|-------|-------|-----------|
+| Scroll horizontal de página (`scrollWidth > vw`) | NO | NO | ✓ contenido |
+| Nav → burger en móvil, menú completo en tablet+ | burger | menú | ✓ correcto |
+| `.tsv3__grid` (testimonios 3-col) colapsa | 1 col | — | ✓ |
+| Tarjeta visible de Paquetes en viewport | sí (l16→359) | — | ✓ |
+| Página servicio (bodas) — render + sin h-scroll | OK | — | ✓ |
+
+**Veredicto responsividad:** sólida. Sin overflow horizontal en ningún breakpoint.
+Los elementos que sobresalen del viewport son **hermanos de carrusel** (cards de
+Paquetes/Rosa/servicios fuera de pantalla) correctamente clipeados — no generan scroll.
+
+### Hallazgo de resiliencia (no es bug en wamp, pero anotado)
+Cuando el import ESM de Framer Motion (`esm.sh`) **no carga** (red bloqueada / sandbox sin
+internet), ocurren dos cosas en el primer render:
+1. Los contenedores grid envueltos en `motion.div` (ej. `.pkc__grid`) pierden `display:grid`
+   en modo fallback hasta un reload (los grids NO envueltos, como `.tsv3__grid`, sí aplican bien).
+2. `Floats` no está dentro de un `SectionBoundary` → si lanza durante la carrera de render,
+   puede dejar `#root` vacío hasta recargar.
+
+En producción (wamp + internet) FM carga y todo renderiza. Mejora futura sugerida:
+envolver `Floats` en `SectionBoundary` y/o garantizar `window.AnimatePresence` fallback
+**antes** del primer `ReactDOM.render` para tolerar fallos de CDN.
+
+---
+
 ## 4. Lo que NO se debe tocar
 
 - El masthead de portada del hero (ancla diferenciadora)
