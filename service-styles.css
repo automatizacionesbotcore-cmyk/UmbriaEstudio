@@ -587,10 +587,9 @@ img { max-width: 100%; display: block; }
   :root {
     --svc-gutter: 20px;
   }
+  /* Oculta solo "Home"; conserva el nav para que "Cotizar" siga visible como botón-flecha.
+     (Antes: .svc-nav nav { display:none } ocultaba TODO, dejando el móvil sin CTA.) */
   .svc-nav nav a:first-child {
-    display: none;
-  }
-  .svc-nav nav {
     display: none;
   }
   .svc-nav nav a:last-child {

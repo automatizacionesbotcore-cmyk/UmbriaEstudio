@@ -71,6 +71,29 @@ de scroll horizontal — el bug #1 en móvil. Cubre `index v2.html` + páginas d
 Los elementos que sobresalen del viewport son **hermanos de carrusel** (cards de
 Paquetes/Rosa/servicios fuera de pantalla) correctamente clipeados — no generan scroll.
 
+### 3.c Las 5 one-page de servicio (bodas, estudio, maquillaje, graduaciones, audiovisual)
+
+Las 5 comparten `service-styles.css` + `service-page.js` + `service-data.js`. Probadas
+las 5 en navegador a 375/768/desktop:
+
+| Página | Render | h-scroll 375 | Imágenes rotas | Título |
+|--------|--------|--------------|----------------|--------|
+| Bodas (01) | ✓ 9 sec | NO | 0/12 | ✓ |
+| Estudio (02) | ✓ 9 sec | NO | 0/12 | ✓ |
+| Maquillaje (03) | ✓ 9 sec | NO | 0/12 | ✓ |
+| Graduaciones (04) | ✓ 11 sec | NO | 0/28 | ✓ |
+| Audiovisual (05) | ✓ 10 sec | NO | 0/12 | ✓ |
+
+Todos los assets referenciados (`pdf-frames/*`, `team/*`) existen — sin imágenes rotas.
+Diseño on-brand confirmado por screenshot (Bodoni gigante + cobre + foto real con grain).
+
+**BUG corregido (afectaba las 5):** en `service-styles.css @media (max-width:640px)`,
+la regla `.svc-nav nav { display: none }` ocultaba **todo** el nav móvil — incluido el
+botón **"Cotizar"** que el CSS siguiente intentaba convertir en botón-flecha "→". Resultado:
+el móvil quedaba **sin CTA ni navegación**, solo el logo. Fix: eliminada esa regla; ahora
+solo se oculta "Home" y "Cotizar" persiste como botón-flecha compacto (verificado: visible,
+46px, dentro del viewport a 375px).
+
 ### Hallazgo de resiliencia (no es bug en wamp, pero anotado)
 Cuando el import ESM de Framer Motion (`esm.sh`) **no carga** (red bloqueada / sandbox sin
 internet), ocurren dos cosas en el primer render:
