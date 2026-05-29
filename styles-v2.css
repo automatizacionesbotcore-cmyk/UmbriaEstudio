@@ -23,6 +23,14 @@
   --line: rgba(10,10,10,0.12);
   --line-strong: rgba(10,10,10,0.5);
 
+  /* Sombras — escala tokenizada de 3 niveles */
+  --shadow-sm: 0 8px 32px rgba(10,10,10,0.16);
+  --shadow-md: 0 12px 40px rgba(10,10,10,0.18);
+  --shadow-lg: 0 20px 56px rgba(10,10,10,0.24), 0 4px 14px rgba(10,10,10,0.10);
+
+  /* Foco accesible */
+  --focus-ring: 0 0 0 2px var(--cream), 0 0 0 4px var(--champagne);
+
   /* Type */
   --magazine: "Bodoni Moda", "Didot", "Playfair Display", Georgia, serif;
   --display: "Bodoni Moda", "Didot", "Playfair Display", Georgia, serif; /* alias de --magazine — usado en tarjetas pkc */
@@ -2852,11 +2860,11 @@ section { position: relative; }
 }
 .story__card--back {
   z-index: 1;
-  box-shadow: 0 8px 32px rgba(10,10,10,0.16);
+  box-shadow: var(--shadow-sm);
 }
 .story__card--front {
   z-index: 2;
-  box-shadow: 0 20px 56px rgba(10,10,10,0.24), 0 4px 14px rgba(10,10,10,0.10);
+  box-shadow: var(--shadow-lg);
 }
 .story__card-badge {
   position: absolute;
@@ -3280,7 +3288,7 @@ section { position: relative; }
 .pkc__card--featured {
   background: var(--ink);
   border-color: rgba(197,167,117,.35);
-  box-shadow: 0 12px 40px rgba(10,10,10,.18);
+  box-shadow: var(--shadow-md);
 }
 .pkc__card--featured:hover {
   box-shadow: 0 24px 56px rgba(10,10,10,.28);
@@ -5322,4 +5330,48 @@ svg {
   .chatbot__head {
     padding-block: 10px;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ACCESIBILIDAD — foco visible + reduced motion (rama design/audit)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Foco visible cobre — solo teclado, no mouse (:focus-visible) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.btn:focus-visible,
+.pkc__tab:focus-visible,
+.hero__er-dot:focus-visible,
+.story__dot:focus-visible,
+.story__card-next:focus-visible,
+.tsv3__arrow:focus-visible,
+.float-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 3px;
+}
+/* En fondos oscuros, invertir el halo interior a ink */
+.section--dark a:focus-visible,
+.section--dark button:focus-visible,
+.tsv3 button:focus-visible,
+.hero a:focus-visible,
+.hero button:focus-visible {
+  box-shadow: 0 0 0 2px var(--ink), 0 0 0 4px var(--champagne);
+}
+
+/* Respeta la preferencia del sistema de reducir movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Neutraliza el parallax del hero (transform via JS inline) */
+  .hero__bg { transform: none !important; }
 }

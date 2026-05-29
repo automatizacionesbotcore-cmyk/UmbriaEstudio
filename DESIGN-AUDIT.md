@@ -33,19 +33,17 @@
 
 ---
 
-## 3. Refinamientos recomendados (pendientes — requieren confirmación)
+## 3. Refinamientos recomendados
 
-Priorizados por impacto/esfuerzo. No aplicados aún — discutir con el usuario.
+### Aplicados en esta rama (commit 2)
+- [x] **Foco accesible** — `:focus-visible` con anillo cobre (`--focus-ring`) en tabs, dots, botones flotantes, flechas, links, inputs. Halo interior se invierte a ink en fondos oscuros/hero. WCAG ✓
+- [x] **Reduced motion** — `@media (prefers-reduced-motion: reduce)` neutraliza animaciones, transiciones, auto-cycles y el parallax del hero.
+- [x] **Sombras tokenizadas** — escala de 3 niveles en `:root` (`--shadow-sm/md/lg`); aplicada a story stack y pkc featured (valores idénticos a los previos → sin cambio visual, solo consistencia).
+- [x] **Espaciado entre secciones** — verificado: `.section` ya usa `clamp(80px,14vh,160px)` uniforme. Ritmo correcto, no requiere cambio.
 
-### Alta prioridad
-- [ ] **Jerarquía de espaciado entre secciones** — verificar ritmo vertical consistente (`padding` de `.section`). Las secciones editoriales se benefician de respiración generosa y constante.
-- [ ] **Foco accesible** — confirmar `:focus-visible` con anillo cobre en todos los interactivos (tabs, dots, botones flotantes, flechas testimonios). Crítico para WCAG y para sensación de pulido.
-- [ ] **Contraste del lede del hero** sobre foto — el overlay gradiente ayuda, pero validar AA del texto crema sobre las zonas claras de cada foto ER.
-
-### Media prioridad
-- [ ] **Reduced motion** — añadir `@media (prefers-reduced-motion: reduce)` que desactive parallax, auto-cycles (hero 3.6s, paquetes 5.5s, historia 4s) y blur-word. Hoy todo se mueve siempre.
-- [ ] **Optical alignment** del masthead y counters — revisar que los números editoriales (`01`, `01/04`) usen tabular-nums en todos lados (hecho en hero, falta auditar historia/testimonios).
-- [ ] **Sombras con intención** — unificar la escala de sombra (cards pkc, story stack, er-frame) en 2-3 niveles tokenizados en vez de valores sueltos.
+### Pendientes — requieren validación visual en navegador
+- [ ] **Contraste del lede del hero** sobre foto — overlay gradiente ayuda, pero validar AA del crema sobre zonas claras de cada foto ER.
+- [ ] **Optical alignment** — auditar tabular-nums en counters de historia/testimonios (hecho en hero + pkc).
 
 ### Baja prioridad / opcional
 - [ ] Cursor personalizado en desktop (punto cobre) — encaja con el mood editorial, refuerza el ancla.
