@@ -675,14 +675,20 @@
       document.body.style.overflow = 'hidden';
       // recolocar cámara/modelo al centro para orbitar (cuerpo de la cámara centrado en pantalla)
       pivot.position.set(0,0,0); pivot.rotation.set(0,0,0); pivot.scale.setScalar(1.05);
-      camera.position.set(0, 0, 7.2);          // cámara al centro vertical (antes y:-0.05)
+      // El modelo es una cámara sobre trípode: el centro geométrico cae en el trípode.
+      // Apuntamos la órbita al CUERPO de la cámara (parte alta del bbox) para que la cámara
+      // quede al centro del anillo de servicios y el trípode cuelgue debajo.
+      const _box = new THREE.Box3().setFromObject(pivot);
+      const _c = _box.getCenter(new THREE.Vector3());
+      _c.y = _box.min.y + (_box.max.y - _box.min.y) * 0.78;
+      camera.position.set(_c.x, _c.y, 7.2);
       if(!controls){
         controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true; controls.dampingFactor = 0.08;
         controls.enablePan = false; controls.minDistance = 4.5; controls.maxDistance = 11;
         controls.autoRotate = true; controls.autoRotateSpeed = 1.5;  // giro más vivo para apreciar el resalte por servicio
       }
-      controls.target.set(0, 0, 0);            // modelo centrado en pantalla (antes y:-0.4 lo descuadraba)
+      controls.target.copy(_c);                // mira al centro real del modelo (no a 0,0,0)
       controls.enabled = true;
       layoutChips();
       document.body.classList.add('exploring');
