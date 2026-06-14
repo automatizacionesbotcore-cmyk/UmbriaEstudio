@@ -59,6 +59,9 @@
     .panel__inner{ width:100%; max-width:1240px; margin:0 auto; will-change:transform,opacity; }
 
     .svc{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(24px,6vw,90px); align-items:center; }
+    /* Ambos en la fila 1: en data-align="right" el texto va antes que la foto en el DOM,
+       y el auto-placement sparse mandaba la foto a la fila 2 (texto arriba, foto abajo en diagonal). */
+    .svc__text, .svc__photo{ grid-row:1; }
     .svc[data-align="left"]  .svc__text{ grid-column:1; justify-self:start; text-align:left; }
     .svc[data-align="left"]  .svc__photo{ grid-column:2; justify-self:end; }
     .svc[data-align="right"] .svc__text{ grid-column:2; justify-self:end; text-align:right; }
@@ -172,9 +175,15 @@
       opacity:0; transition:opacity .5s ease;
       box-shadow:0 10px 30px -12px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.08);
     }
-    #explore.on .chip{ opacity:1; }
+    #explore.on .chip{ opacity:.42; transition:opacity .45s ease, transform .45s ease, background .45s ease, border-color .45s ease, box-shadow .45s ease; }
+    /* servicio que mira a la cámara: resaltado; el resto, atenuado */
+    #explore.on .chip.is-active{ opacity:1; transform:translate(-50%,-50%) scale(1.14);
+      background:rgba(201,120,70,.22); border-color:var(--copper); color:var(--cream);
+      box-shadow:0 16px 44px -10px rgba(201,120,70,.6), inset 0 1px 0 rgba(255,255,255,.14); }
     .chip::before{ content:""; display:inline-block; width:6px; height:6px; border-radius:50%;
-      background:var(--copper); margin-right:9px; vertical-align:middle; }
+      background:var(--copper); margin-right:9px; vertical-align:middle;
+      transition:transform .45s ease; }
+    #explore.on .chip.is-active::before{ transform:scale(1.5); box-shadow:0 0 10px var(--copper); }
 
     /* ---------- Chrome ---------- */
     .top-bar{ position:fixed; top:0; left:0; right:0; z-index:7;
@@ -225,9 +234,9 @@
     @media (max-width:820px){
       .svc{ grid-template-columns:1fr; gap:18px; justify-items:center; }
       .svc[data-align="left"] .svc__text,
-      .svc[data-align="right"] .svc__text{ grid-column:1; text-align:center; justify-self:center; order:1; max-width:100%; }
+      .svc[data-align="right"] .svc__text{ grid-column:1; grid-row:auto; text-align:center; justify-self:center; order:1; max-width:100%; }
       .svc[data-align="left"] .svc__photo,
-      .svc[data-align="right"] .svc__photo{ grid-column:1; justify-self:center; order:0;
+      .svc[data-align="right"] .svc__photo{ grid-column:1; grid-row:auto; justify-self:center; order:0;
         width:clamp(150px,46vw,210px); }
       .svc[data-align="right"] .kicker,
       .svc .kicker{ justify-content:center; }
@@ -581,7 +590,7 @@
     }
     function animate(){
       running = true;
-      if(exploring && controls){ controls.update(); }
+      if(exploring && controls){ controls.update(); updateActiveChip(); }
       else { applyState(); }
       composer.render();
       requestAnimationFrame(animate);
@@ -641,13 +650,24 @@
 
     /* ---------- Modo Explorar (orbit libre) ---------- */
     const exploreEl = $('#explore');
+    let chipEls = [], activeChipIdx = -1;
     function layoutChips(){
-      const chips = gsap.utils.toArray('#explore .chip');
+      chipEls = gsap.utils.toArray('#explore .chip');
       const cx = innerWidth/2, cy = innerHeight/2;
       const r = Math.min(innerWidth, innerHeight) * 0.34;
-      chips.forEach((c,i)=>{ const a = (-Math.PI/2) + i*(2*Math.PI/chips.length);
+      chipEls.forEach((c,i)=>{ const a = (-Math.PI/2) + i*(2*Math.PI/chipEls.length);
         c.style.left = (cx + Math.cos(a)*r) + 'px';
         c.style.top  = (cy + Math.sin(a)*r*0.78) + 'px'; });
+    }
+    // Resalta el servicio que "mira" a la cámara según el ángulo de órbita.
+    function updateActiveChip(){
+      if(!controls || !chipEls.length) return;
+      let az = controls.getAzimuthalAngle();                 // -PI..PI
+      az = ((az % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);   // 0..2PI
+      const idx = Math.round(az / (2*Math.PI/chipEls.length)) % chipEls.length;
+      if(idx === activeChipIdx) return;
+      activeChipIdx = idx;
+      chipEls.forEach((c,i)=> c.classList.toggle('is-active', i===idx));
     }
     function enterExplore(){
       if(exploring) return; exploring = true;
@@ -655,14 +675,14 @@
       document.body.style.overflow = 'hidden';
       // recolocar cámara/modelo al centro para orbitar (cuerpo de la cámara centrado en pantalla)
       pivot.position.set(0,0,0); pivot.rotation.set(0,0,0); pivot.scale.setScalar(1.05);
-      camera.position.set(0, -0.05, 7.2);
+      camera.position.set(0, 0, 7.2);          // cámara al centro vertical (antes y:-0.05)
       if(!controls){
         controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true; controls.dampingFactor = 0.08;
         controls.enablePan = false; controls.minDistance = 4.5; controls.maxDistance = 11;
-        controls.autoRotate = true; controls.autoRotateSpeed = 0.9;
+        controls.autoRotate = true; controls.autoRotateSpeed = 1.5;  // giro más vivo para apreciar el resalte por servicio
       }
-      controls.target.set(0, -0.4, 0);
+      controls.target.set(0, 0, 0);            // modelo centrado en pantalla (antes y:-0.4 lo descuadraba)
       controls.enabled = true;
       layoutChips();
       document.body.classList.add('exploring');
