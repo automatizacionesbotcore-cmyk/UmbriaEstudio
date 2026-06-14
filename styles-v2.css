@@ -32,9 +32,9 @@
   --focus-ring: 0 0 0 2px var(--cream), 0 0 0 4px var(--champagne);
 
   /* Type */
-  --magazine: "Bodoni Moda", "Didot", "Playfair Display", Georgia, serif;
-  --display: "Bodoni Moda", "Didot", "Playfair Display", Georgia, serif; /* alias de --magazine — usado en tarjetas pkc */
-  --script: "Allura", "Pinyon Script", "Great Vibes", cursive;
+  --magazine: "Fraunces", "Playfair Display", "Didot", Georgia, serif;
+  --display: "Fraunces", "Playfair Display", "Didot", Georgia, serif; /* alias de --magazine — usado en tarjetas pkc */
+  --script: "Dancing Script", "Pinyon Script", "Great Vibes", cursive;
   --sans: "Inter", "DM Sans", -apple-system, system-ui, sans-serif;
 
   /* Scale */
