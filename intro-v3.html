@@ -464,7 +464,8 @@
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0xF1ECE4, 0.028);   // niebla clara (tema blanco v3)
+    scene.background = new THREE.Color(0xEDE7DD);      // fondo 3D claro (el composer/bloom borra opaco)
+    scene.fog = new THREE.FogExp2(0xEDE7DD, 0.026);    // niebla del mismo tono que el fondo
 
     const camera = new THREE.PerspectiveCamera(34, innerWidth/innerHeight, 0.1, 100);
     camera.position.set(0, 0.2, 8.2);
@@ -495,7 +496,7 @@
     /* ---------- Post: bloom (brillo del cobre y reflejos) ---------- */
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
-    const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.34, 0.7, 0.92);
+    const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.6, 0.96);  // umbral alto: el fondo claro no se lava, solo brillan los reflejos del cobre/metal
     composer.addPass(bloom);
     composer.addPass(new OutputPass());
     composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -585,8 +586,8 @@
       animate();
     }
 
-    // Cámara procedural: lista al instante, sin descargas ni loader largo.
-    { const cam = buildModernCamera(); fitModel(cam); startExperience(cam); }
+    // (La cámara procedural se inicializa al final del script, una vez definidas
+    //  todas las funciones/consts que usa buildTimeline → evita el TDZ de REVEAL_SEL.)
 
     /* ---------- Render loop ---------- */
     const clock = new THREE.Clock();
@@ -710,9 +711,7 @@
       document.body.style.overflow = 'hidden';
       // recolocar cámara/modelo al centro para orbitar (cuerpo de la cámara centrado en pantalla)
       pivot.position.set(0,0,0); pivot.rotation.set(0,0,0); pivot.scale.setScalar(1.05);
-      // El modelo es una cámara sobre trípode: el centro geométrico cae en el trípode.
-      // Apuntamos la órbita al CUERPO de la cámara (parte alta del bbox) para que la cámara
-      // quede al centro del anillo de servicios y el trípode cuelgue debajo.
+      // Cámara moderna sin trípode: la órbita apunta al centro real del modelo.
       const _box = new THREE.Box3().setFromObject(pivot);
       const _c = _box.getCenter(new THREE.Vector3());
       _c.y = _box.min.y + (_box.max.y - _box.min.y) * 0.5;   // v3 sin trípode: centro real del modelo
@@ -769,6 +768,10 @@
       if(exploring) layoutChips();
       ScrollTrigger.refresh();
     });
+
+    // ── Arranque: ahora que TODAS las funciones/consts están definidas
+    //    (REVEAL_SEL, revealPanel, buildTimeline…) creamos la cámara y lanzamos el render.
+    { const cam = buildModernCamera(); fitModel(cam); startExperience(cam); }
 
     if(!REC) setTimeout(()=>{ if(!running){ window.location.replace(HOME_URL); } }, 18000);
   </script>
