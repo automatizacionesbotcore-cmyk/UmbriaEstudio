@@ -3390,6 +3390,12 @@ section { position: relative; }
   gap: 11px;
   flex: 1;
 }
+/* En el home (teaser sin precios) la lista lleva el divisor que antes daba el price-row */
+.pkc__list--teaser {
+  border-top: 1px solid rgba(201,120,70,.14);
+  padding-top: 20px;
+}
+.pkc__card--featured .pkc__list--teaser { border-top-color: rgba(197,167,117,.18); }
 .pkc__list li {
   display: flex;
   align-items: flex-start;

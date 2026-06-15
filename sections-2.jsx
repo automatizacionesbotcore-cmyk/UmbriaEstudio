@@ -121,6 +121,15 @@ const PACKS = {
   ],
 };
 
+// Los precios viven en cada one-page de servicio; el home solo es teaser.
+const PACK_SERVICE_URL = {
+  familiar: "servicios/estudio/index.html",
+  marca: "servicios/estudio/index.html",
+  cumple: "servicios/estudio/index.html",
+  parejas: "servicios/estudio/index.html",
+  makeup: "servicios/maquillaje/index.html",
+};
+
 const TAB_VISUALS = {
   familiar: {
     src: "assets/pdf-frames/estudio/familia-01.jpg",
@@ -305,15 +314,8 @@ function Paquetes() {
                 </h3>
               </div>
 
-              {/* Price — key on tab+i triggers CSS animation on category change */}
-              <div className="pkc__price-row" key={`${tab}-${i}`}>
-                <span className="pkc__cur">$</span>
-                <span className="pkc__amount">{p.price}</span>
-                <span className="pkc__period">CLP</span>
-              </div>
-
-              {/* Features */}
-              <ul className="pkc__list">
+              {/* Features (sin precios — los valores viven en la página del servicio) */}
+              <ul className="pkc__list pkc__list--teaser">
                 {p.list.map((it, j) => (
                   <li key={j}>
                     <IconCheck featured={p.featured} />
@@ -322,12 +324,10 @@ function Paquetes() {
                 ))}
               </ul>
 
-              {/* CTA */}
+              {/* CTA → página del servicio con paquetes y precios */}
               <div className="pkc__cta">
-                <a href="#contacto" className={`btn ${p.featured ? "btn--gold" : "btn--outline"}`}>
-                  {p.cat.toLowerCase().includes("rosa") || p.cat.toLowerCase().includes("novia")
-                    ? "Reservar prueba"
-                    : "Reservar este pack"}
+                <a href={PACK_SERVICE_URL[tab]} className={`btn ${p.featured ? "btn--gold" : "btn--outline"}`}>
+                  Ver paquetes y precios →
                 </a>
               </div>
 
@@ -338,7 +338,7 @@ function Paquetes() {
 
         {/* Bottom note */}
         <p className="pkc__note">
-          Precios en CLP · IVA incluido · 50% adelanto para reservar fecha
+          Cada servicio tiene su página con paquetes y valores al detalle
           · <a href="#contacto" style={{ color: "var(--copper)" }}>Consultar por bodas →</a>
         </p>
 

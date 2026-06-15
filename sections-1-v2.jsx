@@ -164,7 +164,7 @@ function Hero({ heroImage }) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.9, ease: "easeOut", delay: 0.72 }}
         >
-          Emmanuel y Rosa — fotógrafos de la vida
+          Emmanuel y Rosa, fotógrafos de la vida
         </motion.div>
 
         <motion.p
