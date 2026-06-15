@@ -428,6 +428,7 @@
 
   <script type="module">
     import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
@@ -769,9 +770,24 @@
       ScrollTrigger.refresh();
     });
 
-    // ── Arranque: ahora que TODAS las funciones/consts están definidas
-    //    (REVEAL_SEL, revealPanel, buildTimeline…) creamos la cámara y lanzamos el render.
-    { const cam = buildModernCamera(); fitModel(cam); startExperience(cam); }
+    // ── Arranque: cámara REALISTA (GLB generado con IA). fitModel la centra/escala.
+    //    La procedural queda de fallback si el GLB no carga. Se inicia aquí, al final,
+    //    cuando ya están definidas todas las funciones/consts (evita el TDZ de REVEAL_SEL).
+    const MODEL_URL = 'assets/models/modern-camera.glb';
+    const MODEL_ROT_Y = 0;   // orientación del GLB: 0 = lente al frente (ajustable si hace falta)
+    function applyModelOrient(obj){ obj.rotation.y += MODEL_ROT_Y; }
+    {
+      const fallbackTimer = setTimeout(()=>{ if(!started){
+        const m = buildModernCamera(); fitModel(m); startExperience(m); } }, 12000);
+      new GLTFLoader().load(MODEL_URL,
+        (gltf)=>{ clearTimeout(fallbackTimer); const m = gltf.scene;
+          applyModelOrient(m); fitModel(m); if(!started) startExperience(m); },
+        (ev)=>{ if(ev.lengthComputable){ const p = Math.min(100, Math.round(ev.loaded/ev.total*100));
+          if(barEl) barEl.style.width = p+'%'; if(pctEl) pctEl.textContent = `Preparando la cámara… ${p}%`; } },
+        (err)=>{ clearTimeout(fallbackTimer); console.warn('[Umbría v3] GLB no disponible, cámara procedural:', err);
+          if(!started){ const m = buildModernCamera(); fitModel(m); startExperience(m); } }
+      );
+    }
 
     if(!REC) setTimeout(()=>{ if(!running){ window.location.replace(HOME_URL); } }, 18000);
   </script>
