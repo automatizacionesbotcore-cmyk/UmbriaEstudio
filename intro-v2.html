@@ -149,7 +149,10 @@
       position:fixed; inset:0; z-index:8; opacity:0; visibility:hidden;
       transition:opacity .6s ease, visibility .6s ease; pointer-events:none;
     }
-    #explore.on{ opacity:1; visibility:visible; pointer-events:auto; }
+    /* pointer-events:none para que el arrastre/rueda lleguen al canvas (OrbitControls);
+       solo el botón "Volver" recupera los eventos. */
+    #explore.on{ opacity:1; visibility:visible; pointer-events:none; }
+    #explore.on #exExit{ pointer-events:auto; }
     /* al explorar, ocultar el contenido de scroll para que solo quede la cámara + chrome de explorar */
     main, .scroll-hint, .dots, .progress, .top-bar{ transition:opacity .5s ease, visibility .5s ease; }
     body.exploring main,
