@@ -5,6 +5,7 @@
 :root {
   /* Paleta v2 — cobre oficial del logo Umbría Estudio #C97846 */
   --ink: #0A0A0A;
+  --gris: #16110d;             /* gris cálido para alternar con --ink en secciones oscuras */
   --ink-soft: #1a1614;
   --cream: #F7F1E8;
   --cream-deep: #EFE6D5;
@@ -150,10 +151,12 @@ section { position: relative; }
   flex-shrink: 0;
 }
 .brand__logo {
-  height: 30px;
+  height: 44px;        /* logo Umbría más prominente (antes 30px) */
   width: auto;
   display: block;
+  transition: height 300ms ease;
 }
+.nav.is-scrolled .brand__logo { height: 36px; }   /* se compacta al hacer scroll */
 .nav.is-dark .brand__logo--dark { display: none; }
 .nav:not(.is-dark) .brand__logo--light { display: none; }
 .brand__mono {
@@ -558,6 +561,8 @@ section { position: relative; }
 /* ================= SECTION HEADINGS ================= */
 .section { padding: clamp(80px, 14vh, 160px) 0; }
 .section--dark { background: var(--ink); color: var(--cream); }
+/* Acentos oscuros alternados: Vida Grado en gris (Bodas/Biblioteca/Contacto quedan en ink) */
+#graduaciones.section--dark { background: var(--gris); }
 .section--cream { background: var(--cream); }
 .section--cream-deep { background: var(--cream-deep); }
 
@@ -3541,7 +3546,7 @@ section { position: relative; }
    tsv3__*
    ═══════════════════════════════════════════════════════════════ */
 .tsv3 {
-  background: var(--ink);
+  background: var(--gris);   /* alterna con --ink de las demás secciones oscuras */
   color: var(--cream);
   overflow: hidden;
 }
