@@ -212,6 +212,16 @@
       transition:all .4s ease; display:block; }
     .dots i.on{ background:var(--copper); transform:scale(1.35); }
 
+    /* Sello Umbría que aparece junto a la cámara cuando el lente mira al frente */
+    #camSeal{
+      position:fixed; z-index:5; right:clamp(16px,7vw,90px); top:50%; transform:translateY(-50%) translateY(-10px);
+      width:clamp(120px,15vw,190px); height:auto; opacity:0; pointer-events:none;
+      filter:drop-shadow(0 8px 22px rgba(60,46,32,.18));
+      transition:opacity .7s ease, transform .7s ease;
+    }
+    #camSeal.show{ opacity:.92; transform:translateY(-50%); }
+    @media (max-width:820px){ #camSeal{ display:none; } }
+
     /* ---------- Loader ---------- */
     #loader{ position:fixed; inset:0; z-index:50; background:var(--surface);
       display:flex; flex-direction:column; align-items:center; justify-content:center; gap:28px;
@@ -266,6 +276,9 @@
   <canvas id="scene"></canvas>
   <div id="stage-fx"></div>
   <div id="grain"></div>
+
+  <!-- Sello Umbría: aparece cuando el lente mira al frente -->
+  <img id="camSeal" src="assets/logos/umbria-estudio-dark-text.png" alt="Umbría" aria-hidden="true" />
 
   <!-- Chrome -->
   <div class="progress"><div class="progress__bar" id="bar"></div></div>
@@ -602,10 +615,49 @@
       pivot.rotation.set(S.rx, S.ry, 0);
       pivot.scale.setScalar(S.s*SF);
     }
+
+    // ── Pantalla de la cámara (video) + sello Umbría según orientación ──
+    // Plano con textura de video pegado al dorso del modelo (cara -Z): aparece cuando
+    // el dorso mira al espectador; el sello aparece cuando el lente mira al frente.
+    let screenMat = null, sealEl = null;
+    const _q = new THREE.Quaternion(), _lensDir = new THREE.Vector3(), _camDir = new THREE.Vector3();
+    const SCREEN_IMG = 'assets/pdf-frames/bodas/emmanuel-03.jpg';   // foto luminosa "recién capturada"
+    function addCameraScreen(box){
+      const size = box.getSize(new THREE.Vector3());
+      const tex = new THREE.TextureLoader().load(SCREEN_IMG);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      const w = size.x * 0.44, h = w * 0.68;
+      screenMat = new THREE.MeshBasicMaterial({ map: tex, transparent:true, opacity:0, toneMapped:false });
+      const screen = new THREE.Mesh(new THREE.PlaneGeometry(w, h), screenMat);
+      const cy = box.getCenter(new THREE.Vector3()).y;
+      // dorso del modelo: cara -Z. Con la rotación ~180° el eje X se voltea, así que el
+      // lado +x local cae a la izquierda del espectador (donde aparece el LCD).
+      screen.position.set(box.min.x + size.x*0.62, cy - size.y*0.02, box.min.z + 0.015);
+      screen.rotation.y = Math.PI;   // normal hacia -Z (mira al dorso)
+      pivot.add(screen);
+      // marco fino alrededor de la pantalla
+      const frameMat = new THREE.MeshBasicMaterial({ color:0x0b0c10, transparent:true, opacity:0, toneMapped:false });
+      const frame = new THREE.Mesh(new THREE.PlaneGeometry(w*1.1, h*1.14), frameMat);
+      frame.position.copy(screen.position); frame.position.z += 0.004; frame.rotation.y = Math.PI;
+      pivot.add(frame); screenMat._frame = frameMat;
+    }
+    function updateScreenAndLogo(){
+      if(!modelObj) return;
+      if(!sealEl) sealEl = document.getElementById('camSeal');
+      pivot.getWorldQuaternion(_q);
+      _lensDir.set(0,0,1).applyQuaternion(_q);                 // dirección del lente en el mundo
+      _camDir.copy(camera.position).sub(pivot.position).normalize();
+      const facing = _lensDir.dot(_camDir);                    // >0 lente al frente · <0 dorso al frente
+      if(sealEl) sealEl.classList.toggle('show', facing > 0.45 && !exploring);
+      if(screenMat){ const o = Math.max(0, Math.min(1, (-facing - 0.35) / 0.4));
+        screenMat.opacity = o; if(screenMat._frame) screenMat._frame.opacity = o; }
+    }
+
     function animate(){
       running = true;
       if(exploring && controls){ controls.update(); updateActiveChip(); }
       else { applyState(); }
+      updateScreenAndLogo();
       composer.render();
       requestAnimationFrame(animate);
     }
@@ -781,7 +833,10 @@
         const m = buildModernCamera(); fitModel(m); startExperience(m); } }, 12000);
       new GLTFLoader().load(MODEL_URL,
         (gltf)=>{ clearTimeout(fallbackTimer); const m = gltf.scene;
-          applyModelOrient(m); fitModel(m, 2.3); if(!started) startExperience(m); },   // 2.3 = más chica que la procedural
+          applyModelOrient(m); fitModel(m, 2.3);               // 2.3 = más chica que la procedural
+          const mb = new THREE.Box3().setFromObject(m);        // bbox para ubicar la pantalla
+          if(!started) startExperience(m);
+          addCameraScreen(mb); },
         (ev)=>{ if(ev.lengthComputable){ const p = Math.min(100, Math.round(ev.loaded/ev.total*100));
           if(barEl) barEl.style.width = p+'%'; if(pctEl) pctEl.textContent = `Preparando la cámara… ${p}%`; } },
         (err)=>{ clearTimeout(fallbackTimer); console.warn('[Umbría v3] GLB no disponible, cámara procedural:', err);
