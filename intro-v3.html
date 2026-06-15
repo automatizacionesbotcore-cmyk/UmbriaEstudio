@@ -635,11 +635,12 @@
       //    a la izquierda del lente). Va dentro del contorno y rota/se anima con la cámara. ──
       const logoTex = new THREE.TextureLoader().load('assets/logos/umbria-estudio-cream.png');  // versión clara para que resalte sobre el negro
       logoTex.colorSpace = THREE.SRGBColorSpace;
-      const lW = size.x * 0.30, lH = lW * 0.30;    // badge pequeño, horizontal
+      const lW = size.y * 0.60, lH = lW * 0.28;    // wordmark (será VERTICAL) · alto
       logoMat = new THREE.MeshBasicMaterial({ map: logoTex, transparent:true, opacity:0, toneMapped:false, depthWrite:false, depthTest:false });
       const logo = new THREE.Mesh(new THREE.PlaneGeometry(lW, lH), logoMat);
-      // cara frontal, zona negra del cuerpo a la izquierda del lente
-      logo.position.set(box.min.x + size.x*0.18, cy + size.y*0.18, box.max.z + 0.01);
+      logo.rotation.z = Math.PI/2;                 // vertical (lee de abajo hacia arriba)
+      // cara frontal, zona negra del cuerpo a la izquierda del lente, dentro del contorno
+      logo.position.set(box.min.x + size.x*0.16, cy, box.max.z + 0.01);
       logo.renderOrder = 4;
       pivot.add(logo); logoMat._mesh = logo;
     }
@@ -649,11 +650,8 @@
       _lensDir.set(0,0,1).applyQuaternion(_q);                 // dirección del lente en el mundo
       _camDir.copy(camera.position).sub(pivot.position).normalize();
       const facing = _lensDir.dot(_camDir);                    // >0 lente al frente · <0 dorso al frente
-      // Logo 3D unido a la cámara: aparece cuando el lente mira al frente, se desvanece al girar.
-      // En el hero se oculta (el titular ya es la marca y la cámara está sobre el texto).
-      const onHero = !exploring && panels[0] && panels[0].classList.contains('is-active');
-      if(logoMat){ const lo = onHero ? 0 : Math.max(0, Math.min(1, (facing - 0.15) / 0.45));
-        logoMat.opacity = lo; }
+      // Marca impresa en el cuerpo: visible cuando el lente mira al frente, se desvanece al girar.
+      if(logoMat){ logoMat.opacity = Math.max(0, Math.min(1, (facing - 0.15) / 0.45)); }
       // Pantalla (LCD): foto visible cuando el dorso mira al frente.
       if(screenMat){ const o = Math.max(0, Math.min(1, (-facing - 0.35) / 0.4));
         screenMat.opacity = o; if(screenMat._frame) screenMat._frame.opacity = o; }
