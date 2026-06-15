@@ -521,13 +521,13 @@
 
     /* ---------- Carga modelo ---------- */
     const loaderEl = $('#loader'), barEl = $('#loadbar'), pctEl = $('#pct');
-    function fitModel(obj){
+    function fitModel(obj, target){
       const box = new THREE.Box3().setFromObject(obj);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
       obj.position.sub(center);
       const maxDim = Math.max(size.x, size.y, size.z);
-      obj.scale.setScalar(3.2 / maxDim);
+      obj.scale.setScalar((target || 3.2) / maxDim);
       obj.traverse((o)=>{ if(o.isMesh){ o.castShadow = true; o.receiveShadow = true; } });
     }
 
@@ -773,7 +773,7 @@
     // ── Arranque: cámara REALISTA (GLB generado con IA). fitModel la centra/escala.
     //    La procedural queda de fallback si el GLB no carga. Se inicia aquí, al final,
     //    cuando ya están definidas todas las funciones/consts (evita el TDZ de REVEAL_SEL).
-    const MODEL_URL = 'assets/models/modern-camera.glb';
+    const MODEL_URL = 'assets/models/camera-clean.glb';
     const MODEL_ROT_Y = 0;   // orientación del GLB: 0 = lente al frente (ajustable si hace falta)
     function applyModelOrient(obj){ obj.rotation.y += MODEL_ROT_Y; }
     {
@@ -781,7 +781,7 @@
         const m = buildModernCamera(); fitModel(m); startExperience(m); } }, 12000);
       new GLTFLoader().load(MODEL_URL,
         (gltf)=>{ clearTimeout(fallbackTimer); const m = gltf.scene;
-          applyModelOrient(m); fitModel(m); if(!started) startExperience(m); },
+          applyModelOrient(m); fitModel(m, 2.3); if(!started) startExperience(m); },   // 2.3 = más chica que la procedural
         (ev)=>{ if(ev.lengthComputable){ const p = Math.min(100, Math.round(ev.loaded/ev.total*100));
           if(barEl) barEl.style.width = p+'%'; if(pctEl) pctEl.textContent = `Preparando la cámara… ${p}%`; } },
         (err)=>{ clearTimeout(fallbackTimer); console.warn('[Umbría v3] GLB no disponible, cámara procedural:', err);
